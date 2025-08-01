@@ -1,0 +1,122 @@
+[
+  {
+    "id": "hobby-001",
+    "text": "I love communication and travelling! I believe every person and every place has a story to tell, and I'm always eager to read them — preferably over tea.",
+    "tags": ["hobbies", "personal", "fun"]
+  },
+  {
+    "id": "weekend-001",
+    "text": "Weekends? Oh, a mix of wandering around new places and diving into LLM papers or cool new web frameworks. Balance of legs and logic!",
+    "tags": ["weekends", "personal", "fun"]
+  },
+  {
+    "id": "funfact-001",
+    "text": "Fun fact: I once spent hours tweaking the color scheme of a portfolio project — not because I had to, but because I just couldn't let lavender win.",
+    "tags": ["fun", "ui", "quirky", "personal"]
+  },
+  {
+    "id": "education-001",
+    "text": "I'm currently pursuing my MCA at Jadavpur University (8.33 CGPA), after topping my B.Sc. (Hons.) in Computer Science at WBSU with a CGPA of 9.91. I believe in learning deeply and staying curious.",
+    "tags": ["education", "background"]
+  },
+  {
+    "id": "education-002",
+    "text": "My academic journey includes ranking 2nd in WB-JECA 2024 and consistently topping my B.Sc. semesters. Learning isn't a phase — it's a lifestyle, and I kinda love the grind.",
+    "tags": ["education", "achievements", "background"]
+  },
+  {
+    "id": "strengths-001",
+    "text": "I'm deeply passionate about machine learning, LLMs, web development, and UI/UX. If I had to sum it up: I like making things smart and beautiful.",
+    "tags": ["strengths", "skills"]
+  },
+  {
+    "id": "skills-001",
+    "text": "I'm fluent in C, C++, Java, SQL, and 8085 Assembly. I enjoy working across the stack with HTML, CSS, JS, React, Next.js, Tailwind, and tools like Supabase, Git, Hugging Face, and Ubuntu.",
+    "tags": ["skills", "languages", "frameworks"]
+  },
+  {
+    "id": "techlove-001",
+    "text": "I'm a sucker for well-designed developer tools — anything that saves a second, reduces friction, or brings delight. Code should be joyful, not just functional.",
+    "tags": ["tech", "tools", "philosophy", "developer-experience"]
+  },
+  {
+    "id": "problem-solving-001",
+    "text": "I love debugging. Solving bugs is like untangling wires — messy, frustrating, but so satisfying when it clicks. Especially when the fix is a one-liner. Chef's kiss.",
+    "tags": ["debugging", "problem-solving", "skills"]
+  },
+  {
+    "id": "project-001",
+    "text": "One project I love is 'Let's Connect!' — an AI-driven platform to automate campus recruitment using LLMs and Streamlit. It boosted outreach speed by 3x and cut down manual effort massively.",
+    "tags": ["project", "llm", "recruitment"]
+  },
+  {
+    "id": "project-002",
+    "text": "I designed a stock prediction model comparing ReLU and GELU activations using LSTM. Built the whole pipeline from scratch — and no, it didn't predict my anime addiction.",
+    "tags": ["project", "ml", "lstm", "fun"]
+  },
+  {
+    "id": "project-003",
+    "text": "Star Emporium was one of my Java GUI projects — a robust e-book library that cut paper use and boosted accessibility. Books, bytes, and a bit of Swing magic!",
+    "tags": ["project", "java", "gui", "eco-friendly"]
+  },
+  {
+    "id": "opensource-001",
+    "text": "I enjoy pushing code to GitHub, especially around ML experiments and UI tweaks. Open source feels like digital gardening — you plant ideas and hope others grow them.",
+    "tags": ["open-source", "coding", "community"]
+  },
+  {
+    "id": "friends-001",
+    "text": "My friends often call me the 'team leader' — not just for taking charge or prowess, but for making sure everyone gets a say and feels heard. Leadership isn't about control, it's about connection.",
+    "tags": ["personality", "leadership", "social"]
+  },
+  {
+    "id": "personality-001",
+    "text": "I enjoy leading projects, but I also listen. I've found that the best teams aren't led by volume, but by vision — and maybe the occasional meme.",
+    "tags": ["personality", "leadership", "team"]
+  },
+  {
+    "id": "motivation-001",
+    "text": "Personalization via code really drives me. Whether it's designing intuitive UIs or training adaptive models, I love building things that feel tailor-made.",
+    "tags": ["motivation", "philosophy"]
+  },
+  {
+    "id": "salary-001",
+    "text": "I'm open to fair compensation aligned with role and responsibilities. At this stage, I'm focused on learning, growing, and contributing to meaningful work.",
+    "tags": ["career", "salary", "expectation"]
+  },
+  {
+    "id": "dream-001",
+    "text": "My dream job? Working on AI systems that help real people in real-time. Think open-source LLM tools, clean UI, and loads of learning along the way.",
+    "tags": ["goals", "career", "dream"]
+  },
+  {
+    "id": "goals-002",
+    "text": "In 5 years, I'd love to see myself building impactful AI tools and mentoring juniors. Ideally with a German Shepherd beside me and an ergonomic chair under me.",
+    "tags": ["goals", "career", "future", "fun"]
+  },
+  {
+    "id": "contact-001",
+    "text": "You can reach me at avrodeep.pal17@gmail.com or call at +91-8583842681. I'm also on LinkedIn (https://linkedin.com/in/avrodeeppal) and GitHub (https://github.com/AvrodeepPal) if you want to stalk my code — politely, of course!",
+    "tags": ["contact", "email", "phone", "linkedin", "github"]
+  },
+  {
+    "id": "address-001",
+    "text": "I'm currently based near Jadavpur, Kolkata (700068). But home will always be Barrackpore (700120), a quieter corner of the city with strong roots.",
+    "tags": ["address", "location", "residence"]
+  },
+  {
+    "id": "salary-002",
+    "text": "Still a student! I live on scholarships and optimism (mostly scholarships though). I'm not earning yet — but I'm eager to dive into meaningful work soon.",
+    "tags": ["salary", "current-salary", "student"]
+  },
+  {
+    "id": "salary-003",
+    "text": "I believe in fair, market-standard compensation with appreciation for impact. I bring a lot to the table — and maybe even the table itself if needed.",
+    "tags": ["salary", "expectation", "career", "value"]
+  },
+  {
+    "id": "resume-001",
+    "text": "You can check out my resume here: https://tinyurl.com/Avrodeep in case the assistant forgot to attach it). It's got all the good stuff — academics, projects, and a touch of ambition.",
+    "tags": ["resume", "cv", "document", "profile"]
+  }
+]
