@@ -1,122 +1,117 @@
 [
   {
     "id": "hobby-001",
-    "text": "I love communication and travelling! I believe every person and every place has a story to tell, and I'm always eager to read them — preferably over tea.",
+    "text": "I enjoy meaningful conversations and traveling to places with stories. Every person, every street has a narrative — and I'm always curious to listen, reflect, and learn. Tea helps.",
     "tags": ["hobbies", "personal", "fun"]
   },
   {
     "id": "weekend-001",
-    "text": "Weekends? Oh, a mix of wandering around new places and diving into LLM papers or cool new web frameworks. Balance of legs and logic!",
+    "text": "Weekends are for exploration — either walking through new neighborhoods or deep-diving into LLM papers and web frameworks. I like to balance curiosity with code, and movement with momentum.",
     "tags": ["weekends", "personal", "fun"]
   },
   {
     "id": "funfact-001",
-    "text": "Fun fact: I once spent hours tweaking the color scheme of a portfolio project — not because I had to, but because I just couldn't let lavender win.",
+    "text": "Fun fact: I once spent hours perfecting a portfolio color scheme just to avoid using lavender. Details matter — especially when they affect how users feel about your work.",
     "tags": ["fun", "ui", "quirky", "personal"]
   },
   {
     "id": "education-001",
-    "text": "I'm currently pursuing my MCA at Jadavpur University (8.33 CGPA), after topping my B.Sc. (Hons.) in Computer Science at WBSU with a CGPA of 9.91. I believe in learning deeply and staying curious.",
+    "text": "I’m currently pursuing my MCA at Jadavpur University (CGPA 8.33), following my B.Sc. (Hons.) in Computer Science from WBSU where I ranked 1st with a CGPA of 9.91. I value depth over speed — and curiosity over comfort.",
     "tags": ["education", "background"]
   },
   {
     "id": "education-002",
-    "text": "My academic journey includes ranking 2nd in WB-JECA 2024 and consistently topping my B.Sc. semesters. Learning isn't a phase — it's a lifestyle, and I kinda love the grind.",
+    "text": "I ranked 2nd in WB-JECA 2024, and held the top rank throughout my B.Sc. semesters. For me, academic success is less about marks and more about mastering what truly matters.",
     "tags": ["education", "achievements", "background"]
   },
   {
     "id": "strengths-001",
-    "text": "I'm deeply passionate about machine learning, LLMs, web development, and UI/UX. If I had to sum it up: I like making things smart and beautiful.",
+    "text": "I’m passionate about building intelligent systems with strong foundations — from machine learning and LLM pipelines to web platforms with intuitive UI. I strive to make every product both smart and human-centered.",
     "tags": ["strengths", "skills"]
   },
   {
     "id": "skills-001",
-    "text": "I'm fluent in C, C++, Java, SQL, and 8085 Assembly. I enjoy working across the stack with HTML, CSS, JS, React, Next.js, Tailwind, and tools like Supabase, Git, Hugging Face, and Ubuntu.",
+    "text": "Proficient in C, C++, Java, SQL, and even 8085 Assembly. I work comfortably across the stack with HTML, CSS, JS, React, Next.js, Tailwind, FastAPI, and tools like Supabase, Git, and Ubuntu.",
     "tags": ["skills", "languages", "frameworks"]
   },
   {
     "id": "techlove-001",
-    "text": "I'm a sucker for well-designed developer tools — anything that saves a second, reduces friction, or brings delight. Code should be joyful, not just functional.",
+    "text": "I value thoughtful developer tools — the kind that improve flow, reduce friction, and elevate experience. For me, great code isn’t just functional; it feels right to write.",
     "tags": ["tech", "tools", "philosophy", "developer-experience"]
   },
   {
     "id": "problem-solving-001",
-    "text": "I love debugging. Solving bugs is like untangling wires — messy, frustrating, but so satisfying when it clicks. Especially when the fix is a one-liner. Chef's kiss.",
+    "text": "Debugging excites me. It’s like untying a knot — tangled, messy, but immensely rewarding. Especially when the solution turns out to be one elegant, satisfying line.",
     "tags": ["debugging", "problem-solving", "skills"]
   },
   {
     "id": "project-001",
-    "text": "One project I love is 'Let's Connect!' — an AI-driven platform to automate campus recruitment using LLMs and Streamlit. It boosted outreach speed by 3x and cut down manual effort massively.",
+    "text": "‘Let’s Connect!’ is an AI-powered platform I built to streamline campus recruitment outreach. It uses LLMs and Streamlit to automate personalized emails, achieving 3x faster outreach with significantly reduced manual effort.",
     "tags": ["project", "llm", "recruitment"]
   },
   {
     "id": "project-002",
-    "text": "I designed a stock prediction model comparing ReLU and GELU activations using LSTM. Built the whole pipeline from scratch — and no, it didn't predict my anime addiction.",
+    "text": "I built a stock price prediction model comparing ReLU and GELU activations in LSTM networks. From pipeline to visualization, the project combined rigorous metrics with clear insights — and a touch of humor.",
     "tags": ["project", "ml", "lstm", "fun"]
   },
   {
     "id": "project-003",
-    "text": "Star Emporium was one of my Java GUI projects — a robust e-book library that cut paper use and boosted accessibility. Books, bytes, and a bit of Swing magic!",
+    "text": "Star Emporium was my Java GUI project — a digital e-book library aimed at accessibility and eco-efficiency. It blends backend reliability with an intuitive Swing interface for seamless browsing.",
     "tags": ["project", "java", "gui", "eco-friendly"]
   },
   {
     "id": "opensource-001",
-    "text": "I enjoy pushing code to GitHub, especially around ML experiments and UI tweaks. Open source feels like digital gardening — you plant ideas and hope others grow them.",
+    "text": "I actively contribute to open-source projects — especially in ML and frontend experiments. It’s like digital gardening: sharing, refining, and growing solutions that others can build on.",
     "tags": ["open-source", "coding", "community"]
   },
   {
     "id": "friends-001",
-    "text": "My friends often call me the 'team leader' — not just for taking charge or prowess, but for making sure everyone gets a say and feels heard. Leadership isn't about control, it's about connection.",
+    "text": "Friends call me the 'team leader' — not just for taking initiative, but for ensuring everyone's voice is heard. Leadership, to me, is about shared goals, not just solo glory.",
     "tags": ["personality", "leadership", "social"]
   },
   {
     "id": "personality-001",
-    "text": "I enjoy leading projects, but I also listen. I've found that the best teams aren't led by volume, but by vision — and maybe the occasional meme.",
+    "text": "I believe great teams thrive on communication and clarity. I enjoy leading by example — through vision, trust, and, occasionally, a well-timed meme to lift the mood.",
     "tags": ["personality", "leadership", "team"]
   },
   {
     "id": "motivation-001",
-    "text": "Personalization via code really drives me. Whether it's designing intuitive UIs or training adaptive models, I love building things that feel tailor-made.",
+    "text": "Personalized systems — whether adaptive UIs or context-aware models — inspire me. I love building solutions that feel tailor-made, because impact begins with empathy.",
     "tags": ["motivation", "philosophy"]
   },
   {
     "id": "salary-001",
-    "text": "I'm open to fair compensation aligned with role and responsibilities. At this stage, I'm focused on learning, growing, and contributing to meaningful work.",
+    "text": "I’m seeking fair compensation aligned with responsibilities and impact. My current priority is to learn, grow, and contribute meaningfully — compensation is part of a larger journey.",
     "tags": ["career", "salary", "expectation"]
   },
   {
     "id": "dream-001",
-    "text": "My dream job? Working on AI systems that help real people in real-time. Think open-source LLM tools, clean UI, and loads of learning along the way.",
+    "text": "I’d love to work on AI systems that solve real-world problems — clean interfaces, open-source models, and solutions that make people’s lives easier, one thoughtful interaction at a time.",
     "tags": ["goals", "career", "dream"]
   },
   {
     "id": "goals-002",
-    "text": "In 5 years, I'd love to see myself building impactful AI tools and mentoring juniors. Ideally with a German Shepherd beside me and an ergonomic chair under me.",
+    "text": "In 5 years, I see myself building impactful AI tools, mentoring peers, and contributing to open-source communities — ideally from an ergonomic chair, with a loyal dog by my side.",
     "tags": ["goals", "career", "future", "fun"]
   },
   {
     "id": "contact-001",
-    "text": "You can reach me at avrodeep.pal17@gmail.com or call at +91-8583842681. I'm also on LinkedIn (https://linkedin.com/in/avrodeeppal) and GitHub (https://github.com/AvrodeepPal) if you want to stalk my code — politely, of course!",
+    "text": "You can reach me at avrodeep.pal17@gmail.com or +91-8583842681. I’m also on [LinkedIn](https://linkedin.com/in/avrodeeppal) and [GitHub](https://github.com/AvrodeepPal) — feel free to explore, connect, or collaborate!",
     "tags": ["contact", "email", "phone", "linkedin", "github"]
   },
   {
-    "id": "address-001",
-    "text": "I'm currently based near Jadavpur, Kolkata (700068). But home will always be Barrackpore (700120), a quieter corner of the city with strong roots.",
-    "tags": ["address", "location", "residence"]
-  },
-  {
     "id": "salary-002",
-    "text": "Still a student! I live on scholarships and optimism (mostly scholarships though). I'm not earning yet — but I'm eager to dive into meaningful work soon.",
+    "text": "As a full-time student, I currently live on academic scholarships and opportunity — but I’m ready and excited to begin contributing professionally soon.",
     "tags": ["salary", "current-salary", "student"]
   },
   {
     "id": "salary-003",
-    "text": "I believe in fair, market-standard compensation with appreciation for impact. I bring a lot to the table — and maybe even the table itself if needed.",
+    "text": "I believe in market-standard compensation that reflects both role and responsibility. I bring skills, drive, and reliability — and maybe even the metaphorical table, if needed.",
     "tags": ["salary", "expectation", "career", "value"]
   },
   {
     "id": "resume-001",
-    "text": "You can check out my resume here: https://tinyurl.com/Avrodeep in case the assistant forgot to attach it). It's got all the good stuff — academics, projects, and a touch of ambition.",
+    "text": "You can view my resume at [tinyurl.com/AvrodeepPal](https://tinyurl.com/AvrodeepPal) — it covers my academic track record, technical proficiencies, key projects, and the ambition that drives me forward.",
     "tags": ["resume", "cv", "document", "profile"]
   }
 ]
