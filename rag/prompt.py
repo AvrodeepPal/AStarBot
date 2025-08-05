@@ -1,9 +1,3 @@
-# rag/prompt.py
-"""
-Prompt templates for AStarBot RAG chatbot with Redis memory support
-Defines how the AI should respond using retrieved context and conversation history
-"""
-
 from langchain.prompts import PromptTemplate
 
 # Enhanced RAG prompt template with memory and tone awareness
@@ -36,13 +30,11 @@ You will answer based on two key inputs:
 
 **Answer:**"""
 
-# Create LangChain PromptTemplate object with memory support
 rag_prompt = PromptTemplate(
     input_variables=["context", "question", "chat_history"],
     template=RAG_PROMPT_TEMPLATE
 )
 
-# Fallback prompt when no context is found (now with memory awareness)
 FALLBACK_PROMPT_TEMPLATE = """Hello! I'm AStarBot — the AI assistant for Avrodeep Pal, a top-ranked MCA student from Jadavpur University, passionate about solving real-world problems through AI and full-stack innovation.
 
 Based on our conversation so far, I may not have specific info for your current query, but here's what I *can* help you with:
