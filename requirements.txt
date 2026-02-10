@@ -7,7 +7,7 @@ fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 
 # Vector DB
-pinecone-client>=3.0.0
+pinecone>=3.0.0
 
 # Embeddings
 sentence-transformers>=2.6.1
