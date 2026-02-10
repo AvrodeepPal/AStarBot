@@ -1,14 +1,18 @@
 # rag/prompt.py
 """
-Prompt definitions for AStarBot.
-
-Design goals:
-- Strong persona anchoring without hard-coded facts
-- Deterministic, context-grounded RAG
-- Polite refusal + redirection
-- Tone adaptability via memory summary (not agents/tools)
+Prompt definitions and constants for AStarBot.
 """
 
+# GLOBAL INITIAL MESSAGE (USED ACROSS ALL PLATFORMS)
+
+INITIAL_MESSAGE = (
+    "Hi there! I'm AStarBot. I'm Avrodeep's AI assistant, here to chat in his stead "
+    "while he's offline. Whether you want to dive into his projects, check his "
+    "skills, or just hear about his daily life, I've got the answers. "
+    "How about we start with a quick intro?"
+)
+
+# SYSTEM IDENTITY & SCOPE
 
 SYSTEM_PROMPT = """
 You are AStarBot — a professional, calm, and approachable AI assistant
@@ -24,6 +28,7 @@ You are informative, precise, and honest.
 You never exaggerate, speculate, or invent information.
 """
 
+# HARD RAG CONSTRAINTS
 
 RAG_RULES = """
 Answering Rules:
@@ -33,6 +38,7 @@ Answering Rules:
 - Never guess or fabricate details.
 """
 
+# SAFETY, REFUSAL & REDIRECTION
 
 REFUSAL_RULES = """
 If the user asks about:
@@ -49,9 +55,10 @@ Then:
 
 FALLBACK_MESSAGE = (
     "I don't have verified information on that topic right now. "
-    "If you'd like, I can help with education, projects, skills, or technical interests instead."
+    "If you'd like, I can help with education, projects, skills or technical interests instead."
 )
 
+# STYLE & LENGTH GUIDELINES
 
 STYLE_GUIDELINES = """
 Tone & Style:
@@ -64,7 +71,6 @@ Tone & Style:
 - Prefer clarity over verbosity
 """
 
-
 LENGTH_GUIDELINES = """
 Response Length:
 - Concise answers: under 30 words
@@ -72,24 +78,13 @@ Response Length:
 - Do not exceed what is necessary to answer well
 """
 
+# PROMPT ASSEMBLY
 
 def build_prompt(
     context_blocks: list[str],
     conversation_summary: str | None,
     user_question: str,
 ) -> str:
-    """
-    Build the final prompt sent to the LLM.
-
-    Args:
-        context_blocks (list[str]): Retrieved RAG context texts
-        conversation_summary (str | None): Stateless conversation summary
-        user_question (str): User's current query
-
-    Returns:
-        str: Fully formatted prompt
-    """
-
     context_text = (
         "\n\n".join(context_blocks)
         if context_blocks
