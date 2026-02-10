@@ -1,23 +1,21 @@
-# Core FastAPI and server
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+# Core
+python-dotenv>=1.0.0
+pydantic>=2.6.0
 
-# AI/ML components  
-sentence-transformers==2.2.2
-openai>=1.30.0
-huggingface-hub==0.19.4
+# API
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
 
-# LangChain ecosystem (compatible versions)
-langchain==0.1.17
-langchain-community>=0.0.36,<0.1
-langchain-core==0.1.48
+# Vector DB
+pinecone-client>=3.0.0
 
-# Database connections
-pinecone-client==2.2.4
-redis>=4.5.0
+# Embeddings
+sentence-transformers>=2.6.1
+torch>=2.2.0
+
+# LLMs
+langchain-core>=0.2.0
+langchain-groq>=0.1.5
 
 # Utilities
-python-dotenv==1.0.0
-
-# Auto-resolve packaging (removes conflict)
-pydantic>=2.5.0
+tqdm>=4.66.0

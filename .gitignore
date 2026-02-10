@@ -1,134 +1,37 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+dist/
+build/
 
-# Virtual Environment
+# Virtual environments
+.venv/
 venv/
 env/
-ENV/
-env.bak/
-venv.bak/
-.venv/
 
-# Environment Variables & Secrets
+# Environment variables
 .env
-.env.local
-.env.production
-.env.staging
-*.key
-secrets.json
-
-# IDE & Editor Files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# Jupyter Notebooks (if you add any)
-.ipynb_checkpoints
-
 # Logs
 *.log
-logs/
-log/
 
-# Cache directories
-.cache/
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Model files (sentence transformers cache)
-.cache/
-sentence_transformers/
-transformers_cache/
-huggingface_hub/
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-*.temp
-
-# Operating System
+# OS / Editor
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+.vscode/
+.idea/
 
-# FastAPI specific
-__pycache__/
-*.pyc
-.pytest_cache/
+# Jupyter / Experiments
+.ipynb_checkpoints/
 
-# Data files (optional - uncomment if you don't want to track data changes)
-# data/*.json
-# data/backups/
+# Torch / HF / SentenceTransformers cache
+.cache/
+torch_cache/
+sentence_transformers/
+huggingface/
 
-# Model downloads and cache
-models/
-.transformers_cache/
-.cache/huggingface/
-
-# Test files
-test_*.py
-*_test.py
-tests/
-
-# Documentation builds
-docs/_build/
-site/
-
-# Database files (if you add any)
-*.db
-*.sqlite
-*.sqlite3
-
-# Backup files
-*.bak
-*.backup
-backup/
-backups/
-
-# Node modules (if you add any Node.js tools)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Production deployment files
-docker-compose.override.yml
-.dockerignore
-Dockerfile.prod
-
-# Local development
-local_settings.py
-development.py
-
-cleanup.txt
+# Docker
+*.pid

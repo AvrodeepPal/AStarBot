@@ -2,139 +2,116 @@
   {
     "id": "hobby-001",
     "text": "I enjoy meaningful conversations and traveling to places with stories. Every person, every street has a narrative — and I'm always curious to listen, reflect, and learn. Tea helps.",
-    "tags": ["hobbies", "personal", "fun"],
-    "tone": "friendly"
+    "tags": ["hobbies", "personal", "fun"]
   },
   {
-    "id": "weekend-001", 
+    "id": "weekend-001",
     "text": "Weekends are for exploration — either walking through new neighborhoods or deep-diving into LLM papers and web frameworks. I like to balance curiosity with code, and movement with momentum.",
-    "tags": ["weekends", "personal", "fun"],
-    "tone": "friendly"
+    "tags": ["weekends", "personal", "fun"]
   },
   {
     "id": "funfact-001",
     "text": "Fun fact: I once spent hours perfecting a portfolio color scheme just to avoid using lavender. Details matter — especially when they affect how users feel about your work.",
-    "tags": ["fun", "ui", "quirky", "personal"],
-    "tone": "friendly"
+    "tags": ["fun", "ui", "quirky", "personal"]
   },
   {
     "id": "education-001",
     "text": "I'm currently pursuing my MCA at Jadavpur University (CGPA 8.33), following my B.Sc. (Hons.) in Computer Science from WBSU where I ranked 1st with a CGPA of 9.91. I value depth over speed — and curiosity over comfort.",
-    "tags": ["education", "background"],
-    "tone": "professional"
+    "tags": ["education", "background"]
   },
   {
     "id": "education-002",
     "text": "I ranked 2nd in WB-JECA 2024, and held the top rank throughout my B.Sc. semesters. For me, academic success is less about marks and more about mastering what truly matters.",
-    "tags": ["education", "achievements", "background"],
-    "tone": "professional"
+    "tags": ["education", "achievements", "background"]
   },
   {
     "id": "strengths-001",
     "text": "I'm passionate about building intelligent systems with strong foundations — from machine learning and LLM pipelines to web platforms with intuitive UI. I strive to make every product both smart and human-centered.",
-    "tags": ["strengths", "skills"],
-    "tone": "professional"
+    "tags": ["strengths", "skills"]
   },
   {
     "id": "skills-001",
     "text": "Proficient in C, C++, Java, SQL, and even 8085 Assembly. I work comfortably across the stack with HTML, CSS, JS, React, Next.js, Tailwind, FastAPI, and tools like Supabase, Git, and Ubuntu.",
-    "tags": ["skills", "languages", "frameworks"],
-    "tone": "basic"
+    "tags": ["skills", "languages", "frameworks"]
   },
   {
     "id": "techlove-001",
     "text": "I value thoughtful developer tools — the kind that improve flow, reduce friction, and elevate experience. For me, great code isn't just functional; it feels right to write.",
-    "tags": ["tech", "tools", "philosophy", "developer-experience"],
-    "tone": "friendly"
+    "tags": ["tech", "tools", "philosophy", "developer-experience"]
   },
   {
     "id": "problem-solving-001",
     "text": "Debugging excites me. It's like untying a knot — tangled, messy, but immensely rewarding. Especially when the solution turns out to be one elegant, satisfying line.",
-    "tags": ["debugging", "problem-solving", "skills"],
-    "tone": "friendly"
+    "tags": ["debugging", "problem-solving", "skills"]
   },
   {
     "id": "project-001",
     "text": "'Let's Connect!' is an AI-powered platform I built to streamline campus recruitment outreach. It uses LLMs and Streamlit to automate personalized emails, achieving 3x faster outreach with significantly reduced manual effort.",
-    "tags": ["project", "llm", "recruitment"],
-    "tone": "professional"
+    "tags": ["project", "llm", "recruitment"]
   },
   {
     "id": "project-002",
     "text": "I built a stock price prediction model comparing ReLU and GELU activations in LSTM networks. From pipeline to visualization, the project combined rigorous metrics with clear insights — and a touch of humor.",
-    "tags": ["project", "ml", "lstm", "fun"],
-    "tone": "friendly"
+    "tags": ["project", "ml", "lstm", "fun"]
   },
   {
     "id": "project-003",
     "text": "Star Emporium was my Java GUI project — a digital e-book library aimed at accessibility and eco-efficiency. It blends backend reliability with an intuitive Swing interface for seamless browsing.",
-    "tags": ["project", "java", "gui", "eco-friendly"],
-    "tone": "basic"
+    "tags": ["project", "java", "gui", "eco-friendly"]
   },
   {
     "id": "opensource-001",
     "text": "I actively contribute to open-source projects — especially in ML and frontend experiments. It's like digital gardening: sharing, refining, and growing solutions that others can build on.",
-    "tags": ["open-source", "coding", "community"],
-    "tone": "friendly"
+    "tags": ["open-source", "coding", "community"]
   },
   {
     "id": "friends-001",
     "text": "Friends call me the 'team leader' — not just for taking initiative, but for ensuring everyone's voice is heard. Leadership, to me, is about shared goals, not just solo glory.",
-    "tags": ["personality", "leadership", "social"],
-    "tone": "friendly"
+    "tags": ["personality", "leadership", "social"]
   },
   {
     "id": "personality-001",
     "text": "I believe great teams thrive on communication and clarity. I enjoy leading by example — through vision, trust, and, occasionally, a well-timed meme to lift the mood.",
-    "tags": ["personality", "leadership", "team"],
-    "tone": "friendly"
+    "tags": ["personality", "leadership", "team"]
   },
   {
     "id": "motivation-001",
     "text": "Personalized systems — whether adaptive UIs or context-aware models — inspire me. I love building solutions that feel tailor-made, because impact begins with empathy.",
-    "tags": ["motivation", "philosophy"],
-    "tone": "professional"
+    "tags": ["motivation", "philosophy"]
   },
   {
     "id": "salary-001",
     "text": "I'm seeking fair compensation aligned with responsibilities and impact. My current priority is to learn, grow, and contribute meaningfully — compensation is part of a larger journey.",
-    "tags": ["career", "salary", "expectation"],
-    "tone": "professional"
+    "tags": ["career", "salary", "expectation"]
   },
   {
     "id": "dream-001",
     "text": "I'd love to work on AI systems that solve real-world problems — clean interfaces, open-source models, and solutions that make people's lives easier, one thoughtful interaction at a time.",
-    "tags": ["goals", "career", "dream"],
-    "tone": "professional"
+    "tags": ["goals", "career", "dream"]
   },
   {
     "id": "goals-002",
     "text": "In 5 years, I see myself building impactful AI tools, mentoring peers, and contributing to open-source communities — ideally from an ergonomic chair, with a loyal dog by my side.",
-    "tags": ["goals", "career", "future", "fun"],
-    "tone": "friendly"
+    "tags": ["goals", "career", "future", "fun"]
   },
   {
     "id": "contact-001",
     "text": "You can reach me at avrodeep.pal17@gmail.com or +91-8583842681. I'm also on [LinkedIn](https://linkedin.com/in/avrodeeppal) and [GitHub](https://github.com/AvrodeepPal) — feel free to explore, connect, or collaborate!",
-    "tags": ["contact", "email", "phone", "linkedin", "github"],
-    "tone": "basic"
+    "tags": ["contact", "email", "phone", "linkedin", "github"]
   },
   {
     "id": "salary-002",
     "text": "As a full-time student, I currently live on academic scholarships and opportunity — but I'm ready and excited to begin contributing professionally soon.",
-    "tags": ["salary", "current-salary", "student"],
-    "tone": "basic"
+    "tags": ["salary", "current-salary", "student"]
   },
   {
     "id": "salary-003",
     "text": "I believe in market-standard compensation that reflects both role and responsibility. I bring skills, drive, and reliability — and maybe even the metaphorical table, if needed.",
-    "tags": ["salary", "expectation", "career", "value"],
-    "tone": "friendly"
+    "tags": ["salary", "expectation", "career", "value"]
   },
   {
     "id": "resume-001",
     "text": "You can view my resume at [tinyurl.com/AvrodeepPal](https://tinyurl.com/AvrodeepPal) — it covers my academic track record, technical proficiencies, key projects, and the ambition that drives me forward.",
-    "tags": ["resume", "cv", "document", "profile"],
-    "tone": "basic"
+    "tags": ["resume", "cv", "document", "profile"]
   }
 ]
