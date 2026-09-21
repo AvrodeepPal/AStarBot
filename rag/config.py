@@ -68,8 +68,8 @@ class Settings(BaseSettings):
     # ---- Groq LLM tiers --------------------------------------------------
     groq_api_key: str = ""
     guard_model: str = "meta-llama/llama-prompt-guard-2-86m"
-    primary_llm_model: str = "openai/gpt-oss-120b"
-    fallback_llm_model: str = "openai/gpt-oss-20b"
+    primary_llm_model: str = "openai/gpt-oss-20b"
+    fallback_llm_model: str = "openai/gpt-oss-120b"
     summarizer_llm_model: str = "openai/gpt-oss-20b"
     temperature: float = 0.4
     summarizer_temperature: float = 0.0
