@@ -12,10 +12,13 @@ The prompt-guard LLM (rag.llm) and the INJECTION_DEFENSE prompt block are the
 second and third layers; this module is the first and always runs.
 """
 
+import logging
 import re
 
 from rag.config import settings
 from rag.prompt import LEAK_MARKERS
+
+log = logging.getLogger("astarbot.guardrails")
 
 ALLOWED_ROLES: frozenset[str] = frozenset({"user", "assistant"})
 
@@ -109,17 +112,20 @@ def contains_injection(text: str) -> bool:
     return bool(_INJECTION_RE.search(text or ""))
 
 
-def sanitize_answer(answer: str) -> str:
+def sanitize_answer(answer: str, request_id: str | None = None) -> str:
     """Remove leaked internal markers and cap the length of a model answer."""
     cleaned = _THINK_TAGS.sub("", answer or "")
     cleaned = _LEAK_RE.sub("", cleaned)
     cleaned = CONTROL_CHARS.sub("", cleaned).strip()
     if len(cleaned) > settings.max_answer_chars:
+        orig_len = len(cleaned)
         head = cleaned[: settings.max_answer_chars]
-        # Prefer the last sentence boundary, then a word boundary.
+        # Prefer the last sentence boundary so we never cut mid-markdown
+        # (e.g. inside a `[text](url)` link); fall back to a word boundary.
         idx = max(head.rfind(". "), head.rfind("! "), head.rfind("? "), head.rfind("\n"))
-        if idx > settings.max_answer_chars // 2:
+        if idx > 0:
             cleaned = head[: idx + 1].rstrip()
         else:
             cleaned = head.rsplit(" ", 1)[0].rstrip() + "…"
+        log.info("answer_truncated", extra={"request_id": request_id, "orig_len": orig_len})
     return cleaned

@@ -158,7 +158,7 @@ class RAGEngine:
             return done(STATIC_FALLBACK, summ, "llm_failed", tier)
 
         # 7. output guardrails
-        answer = sanitize_answer(raw_answer)
+        answer = sanitize_answer(raw_answer, request_id)
         if not answer:
             return done(STATIC_FALLBACK, summ, "empty_answer", tier)
 

@@ -96,7 +96,7 @@ class Settings(BaseSettings):
     max_message_chars: int = 2000
     max_summary_chars: int = 2000
     max_messages_sent: int = 20
-    max_answer_chars: int = 1200
+    max_answer_chars: int = 2000
     enable_prompt_guard_llm: bool = True
 
     # ---- CORS ------------------------------------------------------------
