@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "source": "personality",
+    "description": "Values, strengths, opinions, tastes and the parts that don't fit under skills or experience.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-09-21",
+    "version": 1
+  },
+  "entries": [
+    {
+      "id": "pers-values",
+      "title": "What I value",
+      "text": "Intent, more than numbers or credentials. Someone who is trying to do better, learning, evolving — that counts for more with me than a polished result. Each failure is a step into a better version of the thing. I apply the same standard to my own work: an honest number I can defend beats a flattering one I can't.",
+      "links": [],
+      "tags": ["values","principles","what matters","philosophy","intent","growth","failure","honesty","how you think"],
+      "aliases": ["what does he value","his principles","what matters to him"],
+      "priority": 5
+    },
+    {
+      "id": "pers-strengths",
+      "title": "What I'm good at",
+      "text": "Talking to people — I behave like an extrovert, and I genuinely like listening to how someone's upbringing and past shaped the choices they make now. Staying current on Railways, Space and Tech policy, down to PIBs, press releases, tenders, timelines and judgements. And explaining things: an English-medium background means I can pick up a topic quickly and put it simply, with real-life examples, even when my knowledge is thin.",
+      "links": [],
+      "tags": ["strengths","what are you good at","abilities","extrovert","people","listening","communication","oratory","railways","space","policy","current affairs","explaining"],
+      "aliases": ["what is he good at","his strengths","what does he do well"],
+      "priority": 4
+    },
+    {
+      "id": "pers-communication-growth",
+      "title": "What I'm working on",
+      "text": "Communication in professional settings. I joke and use sarcasm constantly, and I've always had friend circles who read the intent behind my words correctly. I can't expect that from people who don't know me, especially in new professional contexts. So I'm working on respecting other people's boundaries with humour, reading situations from their point of view, and being a more deliberate communicator when the room isn't full of people who know me.",
+      "links": [],
+      "tags": ["weakness","working on","self awareness","communication","humour","sarcasm","boundaries","professional","growth","improvement"],
+      "aliases": ["his weaknesses","what is he working on","what does he struggle with","areas for improvement"],
+      "priority": 4
+    },
+    {
+      "id": "pers-ideal-work",
+      "title": "What good work looks like to me",
+      "text": "Freedom paired with responsibility and accountability. Give me room to do what I do best, with clear boundaries and limitations so it stays professional, and I'll take ownership of the outcome. I'd rather have a defined scope I'm trusted inside than an open field with no accountability, or a cage with neither.",
+      "links": [],
+      "tags": ["ideal work","work environment","preferences","culture","freedom","autonomy","accountability","ownership","what do you want"],
+      "aliases": ["what kind of work does he want","ideal workplace","work preferences"],
+      "priority": 4
+    },
+    {
+      "id": "pers-role-models",
+      "title": "People I look up to",
+      "text": "Anyone who can write a story is my hero. A novelist, a balladeer, a poet — but equally a researcher writing up a discovery, or an engineer documenting the ups and downs of their own work. Life is unpredictable and unscripted, and it still manages to write something beautiful. Whoever can capture that has my respect.",
+      "links": [],
+      "tags": ["role models","inspiration","heroes","who do you admire","writers","storytelling","researchers","engineers","philosophy"],
+      "aliases": ["who does he look up to","his role models","who does he admire"],
+      "priority": 3
+    },
+    {
+      "id": "pers-favourite-language",
+      "title": "Favourite programming language",
+      "text": "Java is the first love — I've been writing it since class 9, so about ten years now, and I'd like to keep it going. I moved to C++ for DSA because the STL and manual memory management suited how I think better than Java's libraries did. Python for the last three years, and it'll probably stay, because in this domain the thinking behind the code matters more than the language. If not Python, I'd have gone the Spring Boot and JDBC route.",
+      "links": [],
+      "tags": ["favourite language","programming languages","java","c++","cpp","python","spring boot","jdbc","stl","opinions","preferences"],
+      "aliases": ["what is his favourite language","does he prefer java or python","favourite programming language"],
+      "priority": 4
+    },
+    {
+      "id": "pers-opinions-ai",
+      "title": "Where I think AI is going",
+      "text": "AI is moving at an exponential pace, the way Moore's law did. Layoffs make headlines while hiring quietly continues. I broadly agree that the future is local LLMs, with reasoning models taking a giant leap even if it's within specific domains rather than across the board. If I ever get laid off because I fell short of what AI can do, that's on me and I won't complain. If it's a management decision, all the best to them. I'm always growing, so I don't carry fear about it.",
+      "links": [],
+      "tags": ["opinions","ai opinions","future of ai","llm","local llms","reasoning models","layoffs","jobs","moore's law","predictions","ai safety"],
+      "aliases": ["his opinion on AI","where is AI going","what does he think about AI replacing jobs"],
+      "priority": 4
+    },
+    {
+      "id": "pers-motivation",
+      "title": "What drives me",
+      "text": "Knowing something new properly. Not the gist — the whole article, whatever form the information takes, read end to end. I want the depth and the perspective around a thing, not a summary of it. That's the same instinct that makes me rebuild things from scratch rather than read about them, and it's most of why I'm drawn to research.",
+      "links": [],
+      "tags": ["motivation","what drives you","curiosity","learning","depth","why","purpose","research"],
+      "aliases": ["what motivates him","why does he do this","what drives him"],
+      "priority": 4
+    },
+    {
+      "id": "pers-music",
+      "title": "Music",
+      "text": "Currently 'I Really Want to Stay at Your House' by Rosa Walton, from Cyberpunk: Edgerunners. Mostly anime openings, endings and OSTs, with small sprinkles of English, Hindi and Bengali songs. Playlist on shuffle for the commute to and from office — it keeps the head light.",
+      "links": [],
+      "tags": ["music","anime","ost","soundtrack","rosa walton","edgerunners","cyberpunk","openings","commute","what do you listen to","hobbies"],
+      "aliases": ["what music does he listen to","his favourite song","music taste"],
+      "priority": 2
+    },
+    {
+      "id": "pers-food",
+      "title": "Food",
+      "text": "Being from Barrackpore, the default craving is Dada-Boudi biriyani. Mobina Restaurant for the more special occasions. Beyond that I like trying variety from wherever — cafes, street stalls, lunch or dinner or snacks. Building up digestive capacity while I still have the age for it.",
+      "links": [],
+      "tags": ["food","biriyani","dada boudi","mobina","barrackpore","kolkata food","restaurants","street food","cafes","hobbies","favourite food"],
+      "aliases": ["what food does he like","favourite restaurant","food recommendations"],
+      "priority": 2
+    },
+    {
+      "id": "pers-travel",
+      "title": "Travel and getting out",
+      "text": "I can't stay in a room for long — evening walks or just sitting on the terrace under the sky on casual days. Office trips and weekends out with friends are routine now. On longer trips I've covered the South Indian states; Kerala's backwaters and Ramoji Film City in Hyderabad are the two I'd go back to without a second thought. Next I want to head north, for the mountains and hills.",
+      "links": [],
+      "tags": ["travel","trips","places","kerala","backwaters","hyderabad","ramoji film city","south india","mountains","north india","walks","hobbies","wishlist"],
+      "aliases": ["where has he travelled","travel plans","places he's visited"],
+      "priority": 2
+    },
+    {
+      "id": "pers-comfort-media",
+      "title": "Anime, manga and a book I want to write",
+      "text": "I keep up with the latest anime, movies and manga — it's where I go to reset. On that note, I've wanted to write an anime light novel for a while and have drafted it a few times without finishing. That's probably a project for my fifties, after retirement, when there's time to do it properly.",
+      "links": [],
+      "tags": ["anime","manga","movies","comfort media","relax","recharge","light novel","writing","hobbies","ambitions","fun facts"],
+      "aliases": ["what does he watch","does he like anime","what does he do to relax","comfort shows"],
+      "priority": 3
+    },
+    {
+      "id": "pers-daily-rhythm",
+      "title": "A normal day",
+      "text": "I follow the mood, with work and play in whatever order the day allows. The one constant is that the genuinely productive hours land between 11 PM and 3 AM, so I've stopped fighting that and plan around it instead.",
+      "links": [],
+      "tags": ["daily routine","day in the life","schedule","typical day","night owl","mood","productivity","how does he spend his day"],
+      "aliases": ["what is his daily routine","day in the life","typical day"],
+      "priority": 2
+    }
+  ]
+}

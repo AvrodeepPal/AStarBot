@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "source": "self",
+    "description": "Identity, education, location, current status and career decisions.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-09-21",
+    "version": 3
+  },
+  "entries": [
+    {
+      "id": "self-intro",
+      "title": "Introduction",
+      "text": "I'm Avrodeep Pal, an AI Systems Engineer based in Barrackpore, near Kolkata. I work as an SDE at GenAIus Technology on backend infrastructure for an AI platform: RAG pipelines, agent workflows, model serving and security hardening. MCA from Jadavpur University, B.Sc. Computer Science from Barrackpore Rastraguru Surendranath College where I ranked 1st across WBSU. My interest sits where backend engineering meets applied ML, with cybersecurity running through both.",
+      "links": ["https://avrodeeppal-portfolio.vercel.app", "https://github.com/AvrodeepPal", "https://linkedin.com/in/AvrodeepPal"],
+      "tags": ["introduction","intro","about","about me","who is avrodeep","bio","summary","overview","hello","hi","background","ai systems engineer","role","title"],
+      "aliases": ["who is avrodeep","introduce yourself","tell me about yourself","what does he do"],
+      "priority": 5
+    },
+    {
+      "id": "self-now",
+      "title": "What I'm doing now",
+      "text": "As of September 2026: working at GenAIus on backend infrastructure and multimodal model integration, running an independent research project on reasoning models, and preparing for GATE 2028 as my main target. I'm not open to other work opportunities right now and I don't do freelance. My focus is my current role and the research path.",
+      "links": ["https://github.com/AvrodeepPal"],
+      "tags": ["now","current","currently","what are you working on","status","latest","2026","gate 2028","availability","focus"],
+      "aliases": ["what is he doing now","current status","what's he up to","is he available"],
+      "priority": 5,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "self-now-research",
+      "title": "My research side project",
+      "text": "I'm measuring whether reinforcement learning post-training makes test-time search less useful in small language models. If RL sharpens what a model could already find rather than teaching it something new, then best-of-N and tree search should buy less on top of an RL-tuned model than on the base one. Running on free Kaggle dual-T4 GPUs, using procedurally generated puzzles so the task stays contamination-free.",
+      "links": ["https://github.com/AvrodeepPal/ReasoningPractice"],
+      "tags": ["research","side project","reasoning","grpo","rl","test time compute","search","pass@k","kaggle","t4","gpu","in progress"],
+      "aliases": ["what research is he doing","his research project","current research"],
+      "priority": 5,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "self-gate",
+      "title": "GATE and higher studies",
+      "text": "GATE 2028 is my main target. I sat it in 2024 and 2025 as practice without serious preparation and skipped 2026 to gain industry experience, which was the right call. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models, rather than a standard M.Tech. The research route matters more to me than the degree name.",
+      "links": [],
+      "tags": ["gate","gate 2028","higher studies","masters","ms research","phd","research assistant","exam","preparation","iisc","iit","future plans"],
+      "aliases": ["is he preparing for gate","gate plans","does he want to do a phd","higher studies"],
+      "priority": 5,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "self-research-aspirations",
+      "title": "Where I want to go",
+      "text": "My research interest is reasoning in language models, specifically the trade-off between training-time and inference-time compute. I'm also drawn to bringing verifiable-reward RL into security, where I have production experience and where you can actually check whether a model's reasoning was right, because you know which line was vulnerable. Most reasoning research has a ground-truth problem; security doesn't.",
+      "links": [],
+      "tags": ["research interests","aspirations","goals","reasoning","rl","test time compute","interpretability","llm security","future","ambition","direction"],
+      "aliases": ["what does he want to research","his research interests","where does he want to go"],
+      "priority": 4
+    },
+    {
+      "id": "edu-masters-mca",
+      "title": "MCA at Jadavpur University",
+      "text": "Master of Computer Applications at Jadavpur University, Kolkata, October 2024 to July 2026, under the CSE department. Graduated First Class with CGPA 8.90 out of 10. Alongside coursework I was Placement Coordinator for the batch, presented a seminar on reasoning models, and did my thesis on cross-lingual Bengali idiom matching under Prof. Diganta Saha.",
+      "links": [],
+      "tags": ["masters","mca","postgraduate","jadavpur university","ju","kolkata","cgpa","8.90","first class","education","degree","thesis","seminar"],
+      "aliases": ["where did he do his masters","his mca","jadavpur"],
+      "priority": 4
+    },
+    {
+      "id": "edu-bachelors-bsc",
+      "title": "B.Sc. Computer Science (Hons.)",
+      "text": "B.Sc. Computer Science (Honours) at Barrackpore Rastraguru Surendranath College, under West Bengal State University, October 2021 to August 2024. CGPA 9.91 out of 10 and 1st rank in Computer Science across WBSU. The syllabus gave me the foundations I still lean on: operating systems, networks, DBMS, data structures.",
+      "links": [],
+      "tags": ["bachelors","bsc","undergraduate","computer science honours","barrackpore rastraguru surendranath college","wbsu","cgpa","9.91","rank 1","topper","education","degree"],
+      "aliases": ["where did he do his bachelors","his bsc","undergraduate degree"],
+      "priority": 4
+    },
+    {
+      "id": "edu-wbjeca",
+      "title": "WB-JECA 2024 rank",
+      "text": "Ranked 2nd in WB-JECA 2024 with 101.75 out of 120. It's the state-level entrance exam for MCA admission across West Bengal, covering OOP, data structures, algorithms, operating systems, networking, DBMS and machine learning.",
+      "links": [],
+      "tags": ["wbjeca","wb-jeca","jeca","wbjeeb","entrance exam","rank 2","achievement","score","mca entrance","west bengal","education"],
+      "aliases": ["his jeca rank","entrance exam rank","wbjeca"],
+      "priority": 3
+    },
+    {
+      "id": "edu-school",
+      "title": "Schooling",
+      "text": "St. Augustine's Day School, Barrackpore. 91.80% in ICSE (Class 10), then Science with PCMCs — Physics, Chemistry, Maths, Computer Science — and 95.75% in ISC (Class 12). An English-medium ICSE and ISC background is also why I'm comfortable presenting and explaining things on the spot.",
+      "links": [],
+      "tags": ["school","schooling","icse","isc","class 10","class 12","st augustine","barrackpore","percentage","pcmc","science","education"],
+      "aliases": ["where did he go to school","his school","icse isc marks"],
+      "priority": 3
+    },
+    {
+      "id": "self-placement-coordinator",
+      "title": "Placement Coordinator, MCA Jadavpur",
+      "text": "One of three placement coordinators for the JU MCA 2024-26 batch, with Chitranku Sarkar and Pratik Kotal. The role was mostly documentation and communication: coordinating with recruiters, managing drive logistics, keeping the batch informed, and leaving a roadmap for the juniors. It's also where Let's Connect came from — I built it to fix our own outreach problem.",
+      "links": [],
+      "tags": ["placement coordinator","placements","leadership","coordination","responsibility","mca","jadavpur","ju","teamwork","communication","extracurricular"],
+      "aliases": ["was he a placement coordinator","his leadership role","placements"],
+      "priority": 3
+    },
+    {
+      "id": "self-how-i-work",
+      "title": "How I work",
+      "text": "My best hours are 11 PM to 3 AM, with black tea and anime soundtracks. I work on Linux. My instinct on a new problem is to build the measurement rig before the thing itself — most of my projects are evaluation harnesses wearing a project's clothes. I'd rather ship an honest negative result than a flattering one I can't defend, and I document anything that broke in an interesting way.",
+      "links": [],
+      "tags": ["how i work","working style","habits","midnight coder","night owl","linux","tea","music","approach","methodology","measurement","documentation","personality"],
+      "aliases": ["how does he work","his working style","work habits"],
+      "priority": 4
+    },
+    {
+      "id": "self-career-decisions",
+      "title": "Choices I've made and why",
+      "text": "I chose MCA over an M.Sc. for employability and engineering-faculty exposure. When two offers landed I took the remote startup role over a larger company's information-security position that needed relocation about 2000 km from home — partly family proximity, partly because a small team means touching the whole stack, which is what happened. GATE 2024 and 2025 were practice; 2026 I skipped deliberately for industry experience.",
+      "links": [],
+      "tags": ["career","decisions","choices","why","mca vs msc","job offers","remote","relocation","gate","planning","reasoning"],
+      "aliases": ["why did he choose","his career decisions","why genaius"],
+      "priority": 3
+    },
+    {
+      "id": "self-languages",
+      "title": "Languages I speak",
+      "text": "English, Bengali and Hindi. English is my working language and I think in it — an ICSE and ISC background means I'm fluent enough to take up oratory and explain things simply on the spot, even in unfamiliar territory. Bengali is my mother tongue. My MCA thesis was on Bengali idioms, partly out of curiosity about whether the idioms I grew up with land the same way in a model.",
+      "links": [],
+      "tags": ["languages","bengali","english","hindi","multilingual","spoken languages","mother tongue","oratory","communication"],
+      "aliases": ["what languages does he speak","is he multilingual","does he speak hindi"],
+      "priority": 3
+    },
+    {
+      "id": "self-location-contact",
+      "title": "Location and getting in touch",
+      "text": "Based in Barrackpore, North 24 Parganas, in the Kolkata metropolitan area. I work remotely and commute into Kolkata when needed. The best way to reach me is the Contact Me section on this site or LinkedIn at linkedin.com/in/AvrodeepPal. Good things to write about: reasoning models, LLM infrastructure, applied security, or DSA tips if you have good ones.",
+      "links": ["https://linkedin.com/in/AvrodeepPal"],
+      "tags": ["location","where does he live","city","based in","barrackpore","kolkata","west bengal","india","contact","reach out","email","linkedin","remote"],
+      "aliases": ["where is he based","how do I contact him","his location","contact details"],
+      "priority": 5
+    }
+  ]
+}

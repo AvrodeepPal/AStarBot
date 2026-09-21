@@ -1,24 +1,5 @@
-# Core
-python-dotenv>=1.0.0
-pydantic>=2.6.0
-
-# API
-fastapi>=0.110.0
-uvicorn[standard]>=0.29.0
-
-# Vector DB
-pinecone>=3.0.0
-
-# Embeddings
-sentence-transformers>=2.6.1
-torch>=2.2.0
-
-# LLMs
-langchain-core>=0.2.0
-langchain-groq>=0.1.5
-
-# Utilities
-tqdm>=4.66.0
-
-# Streamlit
-streamlit>=1.33.0
+# Thin shim for platforms that only read requirements.txt (Streamlit Community
+# Cloud, the devcontainer). Dependencies are declared once in pyproject.toml.
+# The extra index makes pip prefer CPU-only torch wheels (no multi-GB CUDA libs).
+--extra-index-url https://download.pytorch.org/whl/cpu
+-e .

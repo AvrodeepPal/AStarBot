@@ -35,3 +35,10 @@ huggingface/
 
 # Docker
 *.pid
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+
+# Streamlit local secrets
+.streamlit/secrets.toml

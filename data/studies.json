@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "source": "studies",
+    "description": "Technical skills, stack, tooling, research reading, coursework and certifications.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-09-21",
+    "version": 3
+  },
+  "entries": [
+    {
+      "id": "prog-low-level",
+      "title": "Low-level languages and DSA",
+      "text": "C, C++ and 8085 Assembly, with DSA practice using the C++ STL. Working close to the metal is what made memory management and code structure concrete for me rather than abstract. I'm on LeetCode at leetcode.com/AvrodeepPal and plan to get into Codeforces and GFG contests properly. Currently brushing this up for GATE 2028, where algorithms, OS and computer organisation all come back around.",
+      "links": ["https://leetcode.com/AvrodeepPal"],
+      "tags": ["c","c++","cpp","assembly","8085","stl","dsa","data structures","algorithms","memory management","leetcode","codeforces","competitive programming","gate","skills"],
+      "aliases": ["his dsa level","leetcode profile","does he know c++"],
+      "priority": 3
+    },
+    {
+      "id": "prog-high-level",
+      "title": "Python, Java and frameworks",
+      "text": "Python and Java are my main languages, plus SQL, JavaScript and shell. Java side: JDBC, Servlets, Spring. Python side: FastAPI for services, pandas and numpy for data, PyTorch and TensorFlow for models. I learn frameworks by building something real with them rather than reading docs cover to cover — that's where the parts documentation glosses over become obvious.",
+      "links": [],
+      "tags": ["python","java","sql","javascript","shell","jdbc","spring","servlets","fastapi","pandas","numpy","frameworks","tech stack","skills"],
+      "aliases": ["what languages does he code in","his tech stack","programming skills"],
+      "priority": 4
+    },
+    {
+      "id": "skills-ml-dl",
+      "title": "Machine learning and deep learning",
+      "text": "PyTorch primarily, with TensorFlow from earlier work. Day to day: HuggingFace Transformers, timm for vision backbones, sentence-transformers for embeddings, Albumentations, scikit-learn. Techniques I've shipped rather than just read: transfer learning, stacking and weighted-voting ensembles, XGBoost, LightGBM and CatBoost, SMOTE-Tomek and class weights for imbalance, SHAP, mixed-precision training, and distributed training with torchrun DDP.",
+      "links": [],
+      "tags": ["machine learning","deep learning","pytorch","tensorflow","transformers","huggingface","timm","sentence-transformers","scikit-learn","xgboost","lightgbm","catboost","ensemble","stacking","smote","shap","ddp","distributed training","mixed precision","skills"],
+      "aliases": ["his ml skills","what ml does he know","deep learning experience"],
+      "priority": 4
+    },
+    {
+      "id": "skills-backend-infra",
+      "title": "Backend and infrastructure",
+      "text": "FastAPI for services, Docker for packaging, Nginx as reverse proxy, PostgreSQL and Redis, SQLAlchemy with Alembic, AWS and S3. I've built Dockerized microservices with role-based access control, layered request pipelines with middleware validation, streaming upload and download paths, SSE and WebSocket streaming, and vector database backends. The part I enjoy most is boundary design — deciding what each service is allowed to know and do, because that's where both security and maintainability get decided.",
+      "links": [],
+      "tags": ["backend","infrastructure","fastapi","docker","microservices","nginx","postgresql","redis","sqlalchemy","alembic","aws","s3","rbac","middleware","api","sse","websocket","streaming","vectordb","architecture","system design","skills"],
+      "aliases": ["his backend skills","infrastructure experience","what backend does he know"],
+      "priority": 4
+    },
+    {
+      "id": "skills-llm-rag",
+      "title": "LLM, RAG and agent work",
+      "text": "Most of what I do professionally. RAG pipelines end to end: document parsing across PDF, DOCX, XLSX, CSV and Markdown, token-aware chunking against each model's real context limit, model-specific query and passage prefixes, embedding generation, HNSW indexing with cosine similarity, incremental reindexing. Prompt engineering for structured output and defensive parsing for when the model ignores it. Agent workflows as composable nodes, plus multimodal integration — vision, ASR, TTS, video generation.",
+      "links": [],
+      "tags": ["llm","rag","retrieval augmented generation","embeddings","chunking","vector search","hnsw","semantic search","prompt engineering","structured output","agents","workflows","multimodal","vision","asr","tts","video generation","pinecone","skills"],
+      "aliases": ["his llm experience","rag skills","does he know rag"],
+      "priority": 5
+    },
+    {
+      "id": "skills-security",
+      "title": "Security and static analysis",
+      "text": "Security runs through my work rather than sitting beside it. Professionally I built an OWASP vulnerability detection engine combining static analysis with LLM semantic understanding, and did security hardening on a production Python backend — input validation, path handling, access control boundaries, regression suites. On my own time I wrote a technical deep dive on the OWASP Top 10 for LLM Applications covering prompt injection, insecure output handling and supply-chain risk.",
+      "links": ["https://github.com/AvrodeepPal/PythonPractice"],
+      "tags": ["security","cybersecurity","infosec","owasp","owasp llm","vulnerability detection","static analysis","sast","prompt injection","llm security","secure coding","hardening","skills"],
+      "aliases": ["his security experience","does he know cybersecurity","owasp"],
+      "priority": 4
+    },
+    {
+      "id": "skills-toolkit",
+      "title": "Tools I actually use",
+      "text": "Linux as the daily driver. My current AI toolkit is Antigravity paired with a Gemini Pro account, Claude Code, and DeepSeek — DeepSeek mostly for planning and working ideas out, Claude Code for actually building. Git and GitHub for everything including personal projects. Docker from day one on anything that needs to be reproducible, rather than retrofitted later.",
+      "links": [],
+      "tags": ["tools","toolkit","setup","linux","antigravity","gemini","claude code","deepseek","ai tools","git","github","docker","workflow","development environment"],
+      "aliases": ["what tools does he use","his setup","what ai tools does he use","dev environment"],
+      "priority": 3,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "res-reasoning-foundations",
+      "title": "Reasoning models and RL foundations",
+      "text": "The RL machinery under modern post-training: MDPs, value functions and Bellman equations, Monte Carlo and temporal-difference methods, Q-learning, the policy gradient theorem, actor-critic and advantage estimation, TRPO then PPO and GRPO. On the LLM side: chain-of-thought, test-time compute scaling, process versus outcome reward models, best-of-N and beam search, Tree of Thoughts and MCTS over reasoning steps. DeepSeek-R1 is the paper that pulled me in — reasoning emerging from RL with verifiable rewards and no supervised traces.",
+      "links": ["https://github.com/AvrodeepPal/ReasoningPractice"],
+      "tags": ["reasoning","reinforcement learning","rl","rlhf","rlvr","grpo","ppo","trpo","policy gradient","bellman","mdp","q learning","monte carlo","mcts","tree of thoughts","chain of thought","test time compute","reward model","prm","orm","deepseek r1","papers","research","theory"],
+      "aliases": ["what does he know about RL","reasoning models","his research reading"],
+      "priority": 5
+    },
+    {
+      "id": "res-learning-path",
+      "title": "How I learned this",
+      "text": "By rebuilding things rather than reading about them. Sebastian Raschka's 'Build a Large Language Model from Scratch' was the big one — I implemented BPE, attention, causal masking and a full GPT-2 decoder in raw PyTorch, then loaded OpenAI's actual GPT-2 weights into my own modules to check I'd got it right. Sutton and Barto for RL, CampusX for breadth, NPTEL's CUDA course for GPU fundamentals. My honest advice: implementing one thing badly from scratch teaches more than reading five papers about it.",
+      "links": ["https://github.com/AvrodeepPal/LLMsPractice", "https://github.com/AvrodeepPal/ReasoningPractice"],
+      "tags": ["learning","how to learn","self taught","resources","advice","books","raschka","sutton barto","campusx","nptel","cuda","papers","first principles","beginner advice","roadmap"],
+      "aliases": ["how did he learn","what should I read","learning advice","resources he recommends"],
+      "priority": 4
+    },
+    {
+      "id": "edu-coursework",
+      "title": "Coursework and certifications",
+      "text": "Core coursework: object-oriented programming, data structures and algorithms, operating systems, computer networking, DBMS, machine learning, cyber security. Certifications: HackerRank SQL Advanced, and Kaggle's Intermediate Machine Learning, Deep Learning and Feature Engineering tracks. Not a certificate collector — these were the ones with actual exercises attached.",
+      "links": [],
+      "tags": ["coursework","subjects","certifications","hackerrank","sql advanced","kaggle","operating systems","networking","dbms","oop","cyber security","credentials","qualifications"],
+      "aliases": ["his certifications","what courses has he done","qualifications"],
+      "priority": 3
+    }
+  ]
+}

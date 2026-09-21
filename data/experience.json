@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "source": "experience",
+    "description": "Professional experience at GenAIus Technology: roles, work areas and measured outcomes.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-09-21",
+    "version": 2,
+    "note": "Written at skill-and-outcome level. Internal architecture, route names, specific vulnerability details and client specifics are deliberately excluded."
+  },
+  "entries": [
+    {
+      "id": "exp-overview",
+      "title": "Professional experience",
+      "text": "I'm a Software Development Engineer at GenAIus Technology, a startup building an AI operating system. I joined as a Python Developer Intern in January 2026 and converted to full-time in July 2026 through a pre-placement offer. I work remotely. My work spans backend infrastructure and security hardening, AI/ML integration including RAG and multimodal model serving, and the node-based workflow platform users build on.",
+      "links": [],
+      "tags": ["experience","work experience","professional","career","job","current job","sde","software engineer","genaius","startup","remote","internship","ppo","overview"],
+      "aliases": ["where does he work","his job","work experience","current role"],
+      "priority": 5
+    },
+    {
+      "id": "exp-company",
+      "title": "What GenAIus Technology does",
+      "text": "GenAIus is a startup building an AI operating system — a platform where technical and non-technical users compose AI workflows as graphs of nodes. You connect a retrieval node, a model generation node, a custom logic node, and the platform runs them with data flowing between. The pitch is building domain-specific tools without writing code, with models runnable on hardware you control rather than API-only.",
+      "links": [],
+      "tags": ["genaius","company","employer","ai operating system","startup","platform","workflows","node based","what does genaius do"],
+      "aliases": ["what is genaius","what does his company do","his employer"],
+      "priority": 4
+    },
+    {
+      "id": "exp-role-sde",
+      "title": "SDE at GenAIus (Jul 2026 – present)",
+      "text": "Full-time since July 2026, converted from my internship. My remit is backend infrastructure on a large production Python system: security hardening, performance work, model integration and platform features. Recently: overhauled the file transfer pipeline, ran a hardware benchmarking framework across 15+ models and three platforms, set up vision, ASR, TTS and video-generation models on server GPUs, and led the migration from bespoke nodes to a reusable generic node system.",
+      "links": [],
+      "tags": ["sde","software development engineer","full time","genaius","current role","2026","backend","infrastructure","python","production","responsibilities","what do you do"],
+      "aliases": ["what does he do at work","his responsibilities","day job"],
+      "priority": 5
+    },
+    {
+      "id": "exp-security-hardening",
+      "title": "Security hardening on a production backend",
+      "text": "A major piece of my work. I audited a large Python backend systematically — tracing request paths end to end rather than spot-checking — then refactored file-path resolution and error handling to close filesystem-level vulnerabilities, and added validation at the gateway boundary so malformed input is rejected before it reaches business logic. Every fix shipped with regression tests: 80+ assertions on the path-handling changes alone. I also fixed a systemic issue where the gateway returned HTTP 200 for every error, which had been silently breaking monitoring, retries and CDN caching.",
+      "links": [],
+      "tags": ["security","hardening","cybersecurity","vulnerability","audit","code audit","input validation","regression testing","error handling","http status codes","monitoring","backend","python","genaius","experience"],
+      "aliases": ["his security work","what security has he done","hardening work"],
+      "priority": 5
+    },
+    {
+      "id": "exp-file-transfer",
+      "title": "File transfer pipeline overhaul",
+      "text": "The upload and download path had two failure modes: browser hangs on hundreds of files, memory spikes on large ones. I rebuilt it — backend uploads now stream to a temp file in fixed chunks with a size cap and single-pass integrity digest instead of buffering in memory, and the frontend got a bounded-concurrency queue with cancellation and batched cache writes. Results: a 300MB upload went from about 1,225MB of gateway memory to 2.6MB, a 470x reduction, and a 200-file operation went from 200 storage writes to one.",
+      "links": [],
+      "tags": ["performance","optimisation","memory","streaming","file upload","file transfer","concurrency","caching","batching","async","470x","frontend","backend","genaius","experience","impact","metrics"],
+      "aliases": ["the 470x memory work","performance work","file upload work"],
+      "priority": 5
+    },
+    {
+      "id": "exp-hardware-benchmarking",
+      "title": "Hardware benchmarking framework",
+      "text": "I designed and ran a benchmark comparing 15+ vision and text models across a laptop CPU, cloud T4 GPUs and server-class workstation GPUs, with platform detection, per-model batch sizing to avoid OOM, and caching so the CPU data path doesn't become what you're accidentally measuring. Documented speedups up to 325x CPU-to-GPU. The more useful finding was negative: that headline number only held under specific conditions, and realistic full-dataset workloads landed nearer 6-10x. I also caught a bug in my own memory tracking where peak values were cumulative rather than per-model.",
+      "links": [],
+      "tags": ["benchmarking","hardware","gpu","cuda","t4","performance","speedup","amdahl","profiling","memory profiling","batch size","vision models","text models","methodology","negative result","325x","genaius","experience"],
+      "aliases": ["benchmarking work","gpu benchmarking","hardware comparison"],
+      "priority": 4
+    },
+    {
+      "id": "exp-vision-ensemble",
+      "title": "Medical image classification ensemble",
+      "text": "A multi-modal skin lesion classifier combining dermoscopic images with patient metadata. Half the job was data engineering: 134,685 raw images across nine ISIC collections, about 50% duplicates from collections repackaging each other, deduplicated down to 39,231 clean images, with splits grouped by lesion ID rather than image to prevent leakage. I trained three diverse backbones with PyTorch DDP and mixed precision, then stacked them with a logistic-regression meta-learner. The ensemble hit 84.04% accuracy, beating the best single model at 82.69% and a fine-tuned 400M-parameter medical foundation model at 81.23%, while training 4.5x faster.",
+      "links": [],
+      "tags": ["computer vision","image classification","medical imaging","skin lesion","isic","ensemble","stacking","multi-modal","efficientnet","convnext","swin","foundation model","ddp","distributed training","data leakage","deduplication","data engineering","pytorch","84%","genaius","experience"],
+      "aliases": ["skin lesion project","medical imaging work","the 84% ensemble"],
+      "priority": 4
+    },
+    {
+      "id": "exp-rag-backend",
+      "title": "RAG and vector database backend",
+      "text": "I built an end-to-end RAG backend: document ingestion, embedding, vector indexing and low-latency semantic search, offline-first with locally cached models. The parts that took thought: a parser layer across PDF, DOCX, XLSX, CSV and Markdown where tables convert to markdown format because embedding models handle those far better than raw CSV; token-aware chunking using each model's own tokenizer rather than a fixed character count; and automatic query and passage prefix handling, since some models expect asymmetric prefixes and quietly underperform without them. Benchmarked five embedding models — the best scored 0.93 similarity on technical documents against 0.67 for the weakest.",
+      "links": [],
+      "tags": ["rag","retrieval augmented generation","vector database","embeddings","semantic search","chunking","hnsw","document parsing","pdf","docx","offline first","sentence-transformers","benchmarking","0.93","internship","genaius","experience"],
+      "aliases": ["his rag work","vector database work","rag backend"],
+      "priority": 5
+    },
+    {
+      "id": "exp-owasp-engine",
+      "title": "OWASP vulnerability detection engine",
+      "text": "Built during my internship: a static analysis plus LLM engine for OWASP vulnerability detection — SQL injection, RCE, XSS and related classes. Static checks run first, then flagged code goes to a language model for semantic understanding, with intent-aware parsing so it can distinguish genuinely dangerous constructs from ones that merely pattern-match, plus handling for obfuscated input. Output is human-readable explanations rather than rule IDs. What I took from it: static analysers are precise but literal, LLMs are contextual but unreliable, and the interesting engineering is the handoff between them.",
+      "links": [],
+      "tags": ["owasp","vulnerability detection","security","cybersecurity","static analysis","sast","sql injection","xss","rce","code analysis","llm","semantic analysis","internship","genaius","experience"],
+      "aliases": ["the owasp checker","code security tool","vulnerability scanner"],
+      "priority": 4
+    },
+    {
+      "id": "exp-backend-architecture",
+      "title": "Microservices, gateway and access control",
+      "text": "I architected Dockerized microservices with FastAPI and role-based access control, designed for independent scaling with consistent error handling. The request path runs through a layered pipeline: middleware validates shape, content type and payload size before anything reaches business logic; session auth attaches user context; then hierarchical access enrichment resolves organisation, project and resource permissions with early exits so requests that don't need a database lookup don't pay for one. Every request carries an ID propagated through all logs, so a production issue can be traced end to end.",
+      "links": [],
+      "tags": ["microservices","architecture","system design","backend","fastapi","docker","rbac","access control","permissions","middleware","gateway","api design","authentication","distributed tracing","logging","clean architecture","internship","genaius","experience"],
+      "aliases": ["backend architecture work","microservices experience","api gateway"],
+      "priority": 4
+    },
+    {
+      "id": "exp-workflow-platform",
+      "title": "Node-based workflow platform",
+      "text": "The platform lets users compose AI workflows as graphs of nodes — a visual editor backed by Python functions, each node a pure function with explicit validated inputs and outputs. I built domain workflows across several verticals, then led the migration from bespoke single-purpose nodes to a reusable generic system where workflows are rebuilt from configurable retrieval and LLM nodes. That cut new workflow development time by about half while making the platform accessible to non-developers. I also wrote the internal node specification so the next person doesn't reverse-engineer conventions from existing code.",
+      "links": [],
+      "tags": ["workflow","node based","visual editor","low code","no code","agent workflows","platform","generic nodes","refactoring","migration","developer experience","documentation","specification","modularity","python","genaius","experience","50%"],
+      "aliases": ["the workflow platform","node system","generic nodes migration"],
+      "priority": 4
+    },
+    {
+      "id": "exp-multimodal",
+      "title": "Multimodal model integration on GPUs",
+      "text": "A good chunk of my recent work: getting vision-language, speech recognition, text-to-speech and image-to-video models running and served on server GPUs, each exposed as a workflow node so users can chain them. Recent examples include an image-to-video pipeline working end to end, audio-driven lip-sync for talking avatars, and a conversational avatar flow where speech is transcribed, translated, re-synthesised and spoken back by a prepared avatar. This is where GPU work gets concrete — VRAM budgeting, quantisation choices, and chasing down why a model that should be fast isn't.",
+      "links": [],
+      "tags": ["multimodal","vision","vlm","asr","speech recognition","whisper","tts","text to speech","video generation","image to video","diffusion","avatar","lip sync","gpu","vram","quantisation","inference","serving","genaius","experience","current work"],
+      "aliases": ["multimodal work","video generation work","gpu work at genaius"],
+      "priority": 4
+    },
+    {
+      "id": "exp-internship",
+      "title": "Python Developer Intern (Jan – Jun 2026)",
+      "text": "My six-month internship, which converted to full-time. Four main things: the static analysis plus LLM engine for OWASP vulnerability detection, the end-to-end RAG backend, production workflows across multiple domains with documentation, and Dockerized microservices with role-based access control. It overlapped with my final MCA semester and placement coordinator duties, which made for a dense six months. What made it work was a small startup giving me production ownership early — the code went live, which is the fastest way to learn what matters.",
+      "links": [],
+      "tags": ["internship","intern","python developer intern","2026","genaius","six months","ppo","pre placement offer","conversion","owasp","rag","microservices","early career","experience"],
+      "aliases": ["his internship","where did he intern","internship experience"],
+      "priority": 4
+    },
+    {
+      "id": "exp-nontech",
+      "title": "What the job taught me beyond code",
+      "text": "Writing for an audience — internal specs someone else has to act on, which is different from writing for yourself. Async communication: remote work means most collaboration happens in writing, so I've learned to anticipate the questions rather than require a follow-up. Reading a codebase before touching it, which the security audit forced on me. And the harder one: shipping something imperfect because users are waiting, which is a real adjustment coming from personal projects with no deadline.",
+      "links": [],
+      "tags": ["soft skills","non technical","communication","writing","async","remote work","shipping","documentation","learned","growth"],
+      "aliases": ["soft skills","what has work taught him","non technical skills"],
+      "priority": 3
+    }
+  ]
+}

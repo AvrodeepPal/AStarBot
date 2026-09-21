@@ -1,16 +1,14 @@
-# main.py
+"""Uvicorn launcher for the FastAPI backend (Docker / Railway entry point)."""
 
-import os
 import uvicorn
 
-if __name__ == "__main__":
-    host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", 8000))
+from rag.config import settings
 
+if __name__ == "__main__":
     uvicorn.run(
-        "api:app",
-        host=host,
-        port=port,
+        "interfaces.api:app",
+        host=settings.host,
+        port=settings.port,
         reload=False,
-        log_level="info",
+        log_level=settings.log_level.lower(),
     )

@@ -1,49 +1,54 @@
-# rag/memory.py
+"""Stateless conversation summarisation.
 
-import os
-from langchain_groq import ChatGroq
-
-SUMMARY_PROMPT = """
-Summarize the conversation so far in 3-5 concise lines.
-Focus only on topics discussed and user intent.
-Do not add new information or assumptions.
-Keep the summary factual and neutral.
+The server keeps no session state. Once the client's message window reaches
+`summary_trigger_after` turns, the engine folds the previous summary and the
+recent turns into a fresh 3-5 line summary and returns it to the client, who
+then trims its window and sends the summary back on the next request.
 """
+
+import logging
+
+from rag.config import settings
+from rag.guardrails import CONTROL_CHARS
+from rag.llm import LLMChain
+from rag.prompt import SUMMARY_PROMPT
+
+log = logging.getLogger("astarbot.memory")
+
+
+def _format_transcript(previous_summary: str | None, recent_messages: list[dict]) -> str:
+    parts: list[str] = []
+    if previous_summary:
+        parts.append(f"Previous summary:\n{previous_summary}")
+    lines = [f"{m['role'].upper()}: {m['content']}" for m in recent_messages]
+    parts.append("Recent messages:\n" + "\n".join(lines))
+    return "\n\n".join(parts)
+
+
+def _clip_lines(text: str, max_lines: int) -> str:
+    lines = [ln.strip() for ln in CONTROL_CHARS.sub("", text).splitlines() if ln.strip()]
+    return "\n".join(lines[:max_lines])
 
 
 def summarize_conversation(
     previous_summary: str | None,
     recent_messages: list[dict],
-) -> str:
-    """
-    Generate a concise, factual summary of the conversation.
+    llm: LLMChain,
+    request_id: str = "-",
+) -> str | None:
+    """Return an updated summary, or the previous one if nothing could be produced."""
+    if not recent_messages:
+        return previous_summary
 
-    Args:
-        previous_summary (str | None): Existing summary (if any)
-        recent_messages (list[dict]): Recent user/assistant turns
+    messages = [
+        ("system", SUMMARY_PROMPT),
+        ("user", _format_transcript(previous_summary, recent_messages)),
+    ]
+    raw = llm.invoke_summarize(messages, request_id)
+    if not raw:
+        return previous_summary
 
-    Returns:
-        str: Updated conversation summary
-    """
-
-    summary_input = ""
-
-    if previous_summary:
-        summary_input += f"Previous summary:\n{previous_summary}\n\n"
-
-    summary_input += "Recent messages:\n"
-    for msg in recent_messages:
-        role = msg["role"].upper()
-        content = msg["content"]
-        summary_input += f"{role}: {content}\n"
-
-    summarizer_llm = ChatGroq(
-        model=os.getenv("SUMMARIZER_LLM_MODEL"),
-        temperature=0.0,  # summaries must be deterministic
-    )
-
-    response = summarizer_llm.invoke(
-        SUMMARY_PROMPT + "\n\n" + summary_input
-    )
-
-    return response.content.strip()
+    summary = _clip_lines(raw, settings.summary_max_lines)
+    if len(summary) > settings.max_summary_chars:
+        summary = summary[: settings.max_summary_chars].rsplit(" ", 1)[0] + "…"
+    return summary or previous_summary

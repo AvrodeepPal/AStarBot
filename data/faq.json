@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "source": "faq",
+    "description": "Literal questions visitors ask, with short direct answers.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-09-21",
+    "version": 1
+  },
+  "entries": [
+    {
+      "id": "faq-availability",
+      "title": "Is Avrodeep open to new roles?",
+      "question": "Is Avrodeep open to new job opportunities?",
+      "text": "Not right now. He's committed to his role at GenAIus Technology and focused on that plus his research work and GATE 2028 preparation. He isn't looking at other opportunities at the moment.",
+      "links": [],
+      "tags": ["availability","open to","hiring","recruiting","job","opportunity","roles","career","faq"],
+      "aliases": ["is he available","is he looking for a job","can I hire him","is he open to offers"],
+      "priority": 5,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "faq-freelance",
+      "title": "Does Avrodeep do freelance work?",
+      "question": "Does Avrodeep take freelance or consulting work?",
+      "text": "No. He doesn't do freelance. His time outside work goes to his research project and GATE preparation.",
+      "links": [],
+      "tags": ["freelance","consulting","contract","one-off","gig","availability","faq"],
+      "aliases": ["does he freelance","is he available for contract work","can I hire him for a project"],
+      "priority": 4,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "faq-collaboration",
+      "title": "Can I collaborate with Avrodeep?",
+      "question": "Can I collaborate with Avrodeep on research or a project?",
+      "text": "Research conversations, yes — especially anything on reasoning models, RL post-training, or LLM security. He's not taking on build work or freelance projects. LinkedIn with a short note about the problem works best.",
+      "links": ["https://linkedin.com/in/AvrodeepPal"],
+      "tags": ["collaboration","collaborate","research","partnership","academic","faq"],
+      "aliases": ["can I work with him","is he open to collaboration","research collaboration"],
+      "priority": 4
+    },
+    {
+      "id": "faq-contact",
+      "title": "How do I contact Avrodeep?",
+      "question": "How do I get in touch with Avrodeep?",
+      "text": "Through the Contact Me section on this site, or LinkedIn at linkedin.com/in/AvrodeepPal. He responds faster to specific messages than to generic introductions.",
+      "links": ["https://linkedin.com/in/AvrodeepPal"],
+      "tags": ["contact","reach out","get in touch","email","linkedin","connect","faq"],
+      "aliases": ["how do I contact him","his email","how to reach him"],
+      "priority": 5
+    },
+    {
+      "id": "faq-location",
+      "title": "Where is Avrodeep based?",
+      "question": "Where does Avrodeep live?",
+      "text": "Barrackpore, North 24 Parganas, in the Kolkata metropolitan area of West Bengal, India. He works remotely and commutes into Kolkata when needed.",
+      "links": [],
+      "tags": ["location","where does he live","city","based in","barrackpore","kolkata","west bengal","india","faq"],
+      "aliases": ["where is he based","what city","his location"],
+      "priority": 5
+    },
+    {
+      "id": "faq-specialisation",
+      "title": "What does Avrodeep specialise in?",
+      "question": "What areas does Avrodeep specialise in?",
+      "text": "Professionally: LLM infrastructure — RAG pipelines, vector search, model serving, agent workflows, and the security hardening that keeps production AI systems standing. In research: reasoning in language models, specifically the trade-off between training-time and inference-time compute. Cybersecurity runs through both.",
+      "links": [],
+      "tags": ["specialisation","expertise","areas","focus","what does he do","ai","llm","rag","security","faq"],
+      "aliases": ["what does he specialise in","his expertise","what is he best at"],
+      "priority": 5
+    },
+    {
+      "id": "faq-gate",
+      "title": "Is Avrodeep preparing for GATE?",
+      "question": "Is Avrodeep preparing for GATE or higher studies?",
+      "text": "Yes — GATE 2028 is his main target. He sat it in 2024 and 2025 as practice and skipped 2026 for industry experience. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models.",
+      "links": [],
+      "tags": ["gate","gate 2028","higher studies","masters","ms research","research assistant","exam","academia","faq"],
+      "aliases": ["is he preparing for gate","gate plans","higher studies plans"],
+      "priority": 5,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "faq-phd",
+      "title": "Does Avrodeep want to do a PhD?",
+      "question": "Is Avrodeep planning a PhD?",
+      "text": "Possibly, but not immediately. The near-term plan is an MS(Research) or research assistant position after GATE 2028, which will tell him whether full-time research is the right fit before committing several years to a PhD.",
+      "links": [],
+      "tags": ["phd","doctorate","graduate school","research career","future plans","faq"],
+      "aliases": ["is he doing a phd","does he want a phd","phd plans"],
+      "priority": 4
+    },
+    {
+      "id": "faq-publications",
+      "title": "Does Avrodeep have publications?",
+      "question": "Does Avrodeep have research publications?",
+      "text": "Not in peer-reviewed venues yet. His MCA thesis on cross-lingual Bengali idiom matching is public on GitHub with full methodology and metrics — it produced an honest negative result. His current side project on reasoning models is working toward a first proper write-up.",
+      "links": ["https://github.com/AvrodeepPal/Cross-Lingual-Bengali-Idiom-Matching-Using-Multilingual-Sentence-Embeddings-Without-Translation"],
+      "tags": ["publications","papers","research","thesis","published","academic","faq"],
+      "aliases": ["has he published","does he have papers","his publications"],
+      "priority": 4
+    },
+    {
+      "id": "faq-resume",
+      "title": "Where is Avrodeep's resume?",
+      "question": "Where can I find Avrodeep's resume or CV?",
+      "text": "It's linked from the home page of this portfolio. For a version tailored to a specific role, reach out through the Contact Me section.",
+      "links": ["https://avrodeeppal-portfolio.vercel.app"],
+      "tags": ["resume","cv","download","portfolio","faq"],
+      "aliases": ["where is his resume","download his cv","can I see his resume"],
+      "priority": 4
+    },
+    {
+      "id": "faq-genaius",
+      "title": "What is GenAIus Technology?",
+      "question": "What does GenAIus Technology do?",
+      "text": "A startup building an AI operating system — a platform where technical and non-technical users compose AI workflows as graphs of nodes, with models runnable on hardware you control. Avrodeep works on backend infrastructure, the workflow platform, security hardening and multimodal model integration.",
+      "links": [],
+      "tags": ["genaius","company","employer","ai operating system","startup","where does he work","faq"],
+      "aliases": ["what is genaius","what does his company do","who does he work for"],
+      "priority": 4
+    },
+    {
+      "id": "faq-experience-years",
+      "title": "How much experience does Avrodeep have?",
+      "question": "How many years of experience does Avrodeep have?",
+      "text": "He's been at GenAIus Technology since January 2026 — first as a Python Developer Intern, then full-time from July 2026. Before that, his ML and software work was through academic projects and independent repos going back to 2021.",
+      "links": [],
+      "tags": ["experience","years","how long","seniority","fresher","career length","faq"],
+      "aliases": ["how many years of experience","how experienced is he","how long has he worked"],
+      "priority": 4
+    },
+    {
+      "id": "faq-stack",
+      "title": "What's Avrodeep's preferred stack?",
+      "question": "What tech stack does Avrodeep prefer?",
+      "text": "Python with FastAPI for services, PostgreSQL and Redis for storage, Docker for packaging. PyTorch with HuggingFace Transformers for ML. React and Tailwind on the frontend. Linux throughout. Java is his oldest language and still the one he'd pick for something built to last.",
+      "links": [],
+      "tags": ["tech stack","stack","preferred tools","python","fastapi","pytorch","docker","postgres","react","linux","java","faq"],
+      "aliases": ["what stack does he use","his preferred technologies","what does he build with"],
+      "priority": 4
+    },
+    {
+      "id": "faq-languages",
+      "title": "What languages does Avrodeep speak?",
+      "question": "What human languages does Avrodeep speak?",
+      "text": "English, Bengali and Hindi. English is his working language; Bengali is his mother tongue.",
+      "links": [],
+      "tags": ["languages","bengali","english","hindi","spoken","multilingual","faq"],
+      "aliases": ["what languages does he speak","does he speak hindi","is he multilingual"],
+      "priority": 3
+    },
+    {
+      "id": "faq-relocation",
+      "title": "Would Avrodeep relocate?",
+      "question": "Is Avrodeep willing to relocate?",
+      "text": "He's not looking at roles right now. Longer term, for a research position he'd consider relocating — he chose a remote role earlier partly for family proximity, but that isn't a permanent constraint.",
+      "links": [],
+      "tags": ["relocation","relocate","moving","remote","location","faq"],
+      "aliases": ["would he relocate","can he move cities","is he willing to move"],
+      "priority": 3
+    },
+    {
+      "id": "faq-mentoring",
+      "title": "Will Avrodeep help students?",
+      "question": "Will Avrodeep do mentoring or give advice to students?",
+      "text": "Occasionally, if the ask is specific. He was a placement coordinator at JU MCA so he's done a lot of it. If you're stuck on something concrete — ML, backend, LLM systems, security, or DSA — reach out on LinkedIn with the actual problem.",
+      "links": ["https://linkedin.com/in/AvrodeepPal"],
+      "tags": ["mentoring","mentor","advice","students","guidance","help","juniors","faq"],
+      "aliases": ["can he mentor me","will he give advice","help for students"],
+      "priority": 3
+    },
+    {
+      "id": "faq-leetcode",
+      "title": "What's Avrodeep's DSA background?",
+      "question": "What's Avrodeep's LeetCode or DSA level?",
+      "text": "He practises on LeetCode at leetcode.com/AvrodeepPal, mainly in C++ with the STL, currently as part of GATE 2028 preparation. He hasn't competed seriously on Codeforces yet. If you have good DSA practice advice, he'd like to hear it.",
+      "links": ["https://leetcode.com/AvrodeepPal"],
+      "tags": ["leetcode","dsa","competitive programming","codeforces","coding practice","faq"],
+      "aliases": ["his leetcode","does he do competitive programming","dsa level"],
+      "priority": 3
+    },
+    {
+      "id": "faq-bot",
+      "title": "How does this chatbot work?",
+      "question": "How was this chatbot built?",
+      "text": "It's a RAG pipeline. Avrodeep's background is written as structured entries, embedded into a vector store, and your question retrieves the closest matches which a language model then answers from. It's built to say it doesn't know rather than invent an answer — so if it declines, that's working as intended.",
+      "links": ["https://github.com/AvrodeepPal"],
+      "tags": ["chatbot","this bot","astarbot","how does this work","how were you built","rag","vector search","pinecone","embeddings","faq"],
+      "aliases": ["how does this chatbot work","what powers this bot","are you an AI"],
+      "priority": 5
+    }
+  ]
+}

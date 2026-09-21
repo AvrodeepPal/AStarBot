@@ -1,342 +1,157 @@
-# AStarBot – Backend for a Personal AI Portfolio Assistant
+# AStarBot v2 — Grounded, Bounded, Stateless Portfolio Assistant
 
-AStarBot is a **backend-only Retrieval-Augmented Generation (RAG) system** designed to power a personal AI assistant for Avrodeep Pal.
-The system answers questions about education, projects, skills, and interests using a **curated knowledge base** and modern large language models, while maintaining strict control over accuracy, tone, and scope.
-
-This project prioritizes **engineering clarity, determinism, and maintainability** over autonomous or agent-based behavior.
-
----
-
-## 1. Project Motivation
-
-Personal portfolio chatbots often suffer from one or more of the following issues:
-
-* hallucinated or exaggerated information
-* poor grounding in verified data
-* excessive framework abstraction (agents, tools, orchestration layers)
-* fragile session memory implementations
-* unclear separation between data, prompts, and model logic
-
-AStarBot was built to address these issues by following a few core principles:
-
-* **All factual answers must come from retrieved data**
-* **Memory should be explicit, bounded, and inspectable**
-* **The backend should remain stateless**
-* **Complexity should be earned, not assumed**
-
----
-
-## 2. System Overview
-
-AStarBot is a classic RAG pipeline with a deliberately minimal surface area.
-
-At a high level, the system performs the following steps for every query:
-
-1. Embed the user query
-2. Retrieve the top-k most relevant knowledge entries
-3. Assemble a constrained prompt using:
-
-   * system identity
-   * hard safety rules
-   * retrieved context
-   * summarized conversation memory
-4. Invoke an LLM to generate a response
-5. Optionally update the conversation summary
-6. Return the answer and updated summary to the client
-
-The backend itself **does not store sessions or user state**.
-
----
-
-## 3. Architectural Design
-
-### 3.1 High-Level Data Flow
+AStarBot is a Retrieval-Augmented Generation (RAG) backend that answers questions about **Avrodeep Pal** — education, projects, skills, interests — from a curated knowledge base. It is deliberately *not* a general chatbot: every fact comes from retrieved context, everything else is politely refused, and the server keeps no session state.
 
 ```
-Client (CLI / Frontend)
-        |
-        |  question, recent_messages, summary
-        v
-FastAPI (/chat)
-        |
-        v
-RAG Engine
- ├── Retriever (Pinecone, k=3)
- ├── Prompt Builder
- ├── Primary LLM
- ├── Fallback LLM
- └── Summarization LLM (optional)
-        |
-        v
-Response + Updated Summary
+Client (React / Streamlit / CLI)          holds: recent_messages[], summary
+        │  POST /chat {question, recent_messages, summary}
+        ▼
+FastAPI  interfaces/api.py                request_id, CORS, strict schemas
+        ▼
+RAGEngine  rag/engine.py
+   1. input guardrails      sanitise, cap lengths, whitelist roles
+   2. regex injection screen
+   3. prompt-guard LLM      llama-prompt-guard-2-86m  (fail-open)
+   4. retrieval             BGE-base 768-d (local) → Pinecone top-5
+   5. prompt + LLM chain    gpt-oss-120b → gpt-oss-20b → static fallback
+   6. output guardrails     strip leaks, cap length
+   7. summarise (if window full)   gpt-oss-20b, temp 0
+        │  {answer, updated_summary}
+        ▼
+Client trims its window and sends the summary back next turn
 ```
 
----
-
-### 3.2 Stateless Memory via Summarization
-
-Rather than using Redis or server-side session storage, AStarBot uses **stateless summarized memory**:
-
-* The client sends:
-
-  * recent conversation turns (bounded window)
-  * a short summary of earlier conversation
-* When the window grows beyond a threshold, the backend:
-
-  * generates a new summary using a lightweight LLM
-  * returns the updated summary to the client
-* The client stores and sends this summary on the next request
-
-This approach has several advantages:
-
-* no external memory infrastructure
-* no session coupling to a specific server instance
-* easy horizontal scaling
-* explicit, inspectable memory state
+Design principles: **grounded** (context only), **bounded** (refuse out of scope), **stateless** (no Redis/DB), **deterministic** (no agents/tools), **auditable** (layered versioned prompt, JSON logs), **explicit** (plain try/except fallbacks).
 
 ---
 
-## 4. Knowledge Base Design
+## Quick start
 
-### 4.1 Data Format
+```bash
+cp .env.example .env            # fill PINECONE_API_KEY and GROQ_API_KEY
+make dev                        # pip install -e ".[dev]" with CPU torch
+make embed                      # (re)build the Pinecone index from data/*.json
+make calibrate                  # check on-/off-topic score separation (offline)
+make cli                        # python -m interfaces.cli
+make ui                         # streamlit run interfaces/streamlit_app.py
+make api                        # python main.py  → http://localhost:8000
+make test                       # pytest (offline; Pinecone/Groq are mocked)
+```
 
-All knowledge is stored in JSON files under `/data`.
+Requires Python ≥ 3.11 (3.12 recommended). The first run downloads `BAAI/bge-base-en-v1.5` (~440 MB) into `HF_HOME`; nothing is sent to an embedding API.
 
-Each entry contains:
+### API
 
-* a **semantic ID** (stable, human-readable)
-* text content
-* descriptive tags
+| Method | Path       | Body / Response |
+|--------|------------|-----------------|
+| POST   | `/chat`    | `{question, recent_messages?: [{role, content}], summary?}` → `{answer, updated_summary}` |
+| GET    | `/health`  | `{"status": "ok"}` |
+| GET    | `/version` | app version, prompt version, models, top_k, initial message, client window policy |
 
-Example:
+Limits (422 if exceeded): question ≤ 500 chars, ≤ 20 messages of ≤ 2000 chars, roles `user`/`assistant`, summary ≤ 2000 chars. Every response carries `X-Request-Id`.
+
+---
+
+## Stateless memory contract (clients must follow)
+
+1. Start with `recent_messages = [initial assistant message]`, `summary = null`.
+2. After each `/chat`, append the user turn and the answer.
+3. If `updated_summary` **differs** from the summary you sent, keep only the last **4** turns (`MESSAGES_AFTER_SUMMARY`); otherwise keep the last **12** (`MAX_RECENT_MESSAGES`).
+4. Send `updated_summary` back as `summary` on the next request.
+
+The server summarises when it receives ≥ `SUMMARY_TRIGGER_AFTER` (10) turns. `interfaces/session.py` is the reference implementation; mirror it in the React hook.
+
+---
+
+## Knowledge base
+
+`data/*.json` — six files, one vector per entry, no chunking. Every file is globbed, so adding one needs no code change.
 
 ```json
-{
-  "id": "project-002",
-  "text": "Built a stock price prediction model using LSTM networks...",
-  "tags": ["project", "machine-learning", "lstm"]
-}
+{ "meta": { "source": "faq", "last_updated": "2026-09-21" },
+  "entries": [ { "id": "faq-gate", "title": "Is he preparing for GATE?", "question": "…", "text": "…",
+                 "links": ["https://…"], "tags": ["gate"], "aliases": ["gate plans"], "priority": 5 } ] }
 ```
 
-Design choices:
+`rag/knowledge.py` is the schema contract. Two derived strings are deliberately different:
 
-* **Semantic IDs** are preferred over UUIDs for debuggability
-* No chunking is used; each JSON entry maps to one vector
-* The dataset is assumed to be curated and relatively small
+- **embedded** (`embedding_text`): `title + question + text + aliases` — the title makes a chunk like "Not right now…" unambiguous, and aliases only help retrieval if they're inside the vector.
+- **shown to the LLM** (`context_block`): `title + text + Links:` — clean text, no ids/tags/aliases.
 
----
+Pinecone metadata: `text, title, question, links, tags, priority, last_verified, source`.
 
-### 4.2 Embedding & Indexing
+`make embed` parses and embeds **everything first**, then clears namespace `astarbot` and upserts — a malformed file aborts before anything is deleted, and entries removed from JSON leave no stale vectors. `make embed-dry` does the same without touching Pinecone. The script refuses to write to an index whose dimension ≠ 768.
 
-* Embeddings are generated using `sentence-transformers/all-MiniLM-L6-v2`
-* Vector dimensionality: 384
-* Similarity metric: cosine
-* Storage: Pinecone
-
-The ingestion script (`scripts/embed.py`) performs a **full rebuild**:
-
-* deletes all existing vectors in the namespace
-* re-embeds all JSON entries
-* upserts them with metadata
-
-This makes the process idempotent and avoids stale or duplicated data.
+Pinecone index: `astarbot` · 768-d · cosine · aws us-east-1 · namespace `astarbot`.
 
 ---
 
-## 5. Retrieval Strategy
+## Retrieval
 
-* Top-k retrieval (`k = 3`)
-* No metadata filtering at query time
-* Metadata is preserved for future extensions (e.g., scoring, tone control)
+Three stages, because Pinecone only does the first:
 
-The system intentionally avoids:
+1. Query → `QUERY_PREFIX + question` → BGE-base → over-fetch `FETCH_K` (10) candidates.
+2. Drop anything below `MIN_RETRIEVAL_SCORE` on the **raw** cosine score.
+3. Re-rank by `cosine + PRIORITY_WEIGHT × priority` (0.02 × 2..5 = up to 0.06 — reorders near-ties, never overturns a clear winner) and keep `TOP_K` (5).
 
-* hybrid search
-* reranking models
-* agent-driven retrieval
+**`MIN_RETRIEVAL_SCORE` defaults to 0.0, and that's measured, not lazy.** `make calibrate` runs 24 real questions and 7 off-topic ones against the current data with no network: worst on-topic 0.498, best off-topic 0.614 ("recipe for biryani" is genuinely close to `pers-food`). The distributions overlap, so no threshold separates them and refusal belongs to the prompt's SCOPE block. Re-run after editing the knowledge base; raise the threshold only if the groups actually separate.
 
-The goal is **predictable, explainable retrieval**, not maximum recall at all costs.
+## Prompt (`rag/prompt.py`, `PROMPT_VERSION`)
 
----
+Seven fixed-order blocks: identity → scope → grounding → injection defense → refusal taxonomy → style/length → summary + context + question. Blocks 1–6 ride in the system turn; block 7 (all untrusted material) in the user turn. Bump `PROMPT_VERSION` on any wording change; it is logged per request and exposed at `/version`.
 
-## 6. Prompt Engineering Strategy
+Refusal strings are constants (`REFUSAL_PRIVATE`, `REFUSAL_OFFTOPIC`, `REFUSAL_UNSAFE`, `REFUSAL_JAILBREAK`, `STATIC_FALLBACK`) so responses are consistent whether the guardrail or the model produces them.
 
-Prompting is handled manually (string-based), not via high-level abstractions.
+## LLM tiers (Groq)
 
-The prompt is composed of several conceptual layers:
+| Tier | Model | Job |
+|------|-------|-----|
+| guard | `meta-llama/llama-prompt-guard-2-86m` | jailbreak probability on the raw question; ≥ `GUARD_THRESHOLD` → refuse. Fail-open. |
+| primary | `openai/gpt-oss-120b` | grounded answer |
+| fallback | `openai/gpt-oss-20b` | any primary exception |
+| summarizer | `openai/gpt-oss-20b` @ temp 0 | 3–5 line memory summary |
 
-1. **System identity**
+All models are env-configurable.
 
-   * defines who AStarBot is
-   * constrains scope to portfolio-related topics
+## Logging
 
-2. **Hard RAG rules**
-
-   * answer only from provided context
-   * no guessing or external knowledge
-
-3. **Safety and refusal rules**
-
-   * polite refusal for unsupported or personal questions
-   * redirection to allowed topics
-
-4. **Style and tone guidelines**
-
-   * professional but approachable
-   * concise, non-robotic responses
-   * length constraints
-
-5. **Conversation summary (if present)**
-
-6. **Retrieved context**
-
-7. **User question**
-
-This structure makes it easy to reason about **why** the model answered in a certain way.
+One JSON object per line (`rag/log.py`). `chat_done` records carry `request_id`, `prompt_version`, `embedding_model`, `top_k`, `retrieval_top_score`, `llm_tier_used` (0 primary, 1 fallback, −1 all failed), `outcome`, `latency_ms`. Raw questions appear only at `DEBUG`.
 
 ---
 
-## 7. Model Strategy
+## Layout
 
-### 7.1 Separation of Model Responsibilities
-
-The system deliberately uses **different models for different tasks**:
-
-* **Primary LLM**
-
-  * used for answering user questions
-  * chosen for reasoning quality and availability
-
-* **Fallback LLM**
-
-  * used when the primary model hits rate limits or errors
-  * prioritizes speed and reliability
-
-* **Summarization LLM**
-
-  * used only for memory summarization
-  * deterministic, low temperature, low cost
-
-This separation reduces coupling and improves robustness.
-
----
-
-### 7.2 Invocation Style
-
-* All model calls use `.invoke()`
-* No streaming
-* No tool calls
-* No agent loops
-
-This keeps execution linear and debuggable.
-
----
-
-## 8. API Design
-
-### 8.1 Endpoint Overview
-
-* `POST /chat` – main interaction endpoint
-* `GET /health` – health check
-
-The API is intentionally minimal.
-
----
-
-### 8.2 Request Contract
-
-```json
-{
-  "question": "string",
-  "recent_messages": [
-    { "role": "user", "content": "..." },
-    { "role": "assistant", "content": "..." }
-  ],
-  "summary": "string | null"
-}
+```
+.
+├── main.py                    uvicorn launcher (Docker / Railway)
+├── rag/
+│   ├── config.py              typed Settings from env
+│   ├── log.py                 JSON logging
+│   ├── guardrails.py          input/output sanitisation, injection regex
+│   ├── prompt.py              7-block versioned prompt, refusal constants
+│   ├── knowledge.py           entry schema → embedding text / metadata / context block
+│   ├── retriever.py           local BGE + Pinecone
+│   ├── llm.py                 guard / primary / fallback / summarizer chain
+│   ├── memory.py              summarisation
+│   └── engine.py              orchestrator
+├── interfaces/
+│   ├── api.py                 FastAPI
+│   ├── streamlit_app.py       beta UI
+│   ├── cli.py                 terminal client
+│   └── session.py             shared client window policy
+├── scripts/embed.py           index rebuild (--dry-run)
+├── scripts/calibrate.py       score-distribution check for MIN_RETRIEVAL_SCORE
+├── data/self_data.json        knowledge base
+├── tests/                     offline unit + API tests
+├── Dockerfile · .dockerignore · Makefile · pyproject.toml · .env.example
 ```
 
----
+## Deployment
 
-### 8.3 Response Contract
+- **Railway / Docker**: `docker build -t astarbot .` — multi-stage, CPU-only torch, model baked in, non-root, healthcheck on `/health`. Set env vars from `.env.example` in the dashboard (`PORT` is injected). `--build-arg PREFETCH_MODEL=false` shrinks the image if cold-start downloads are acceptable.
+- **Streamlit Community Cloud**: main file `interfaces/streamlit_app.py`; put env vars in *Secrets* (they are bridged into the environment). `requirements.txt` points pip at `pyproject.toml` with the CPU torch index.
+- **Frontend**: set `FRONTEND_ORIGIN` to the portfolio origin(s), comma-separated.
 
-```json
-{
-  "answer": "string",
-  "updated_summary": "string | null"
-}
-```
+## What this project intentionally does not do
 
-This contract makes frontend integration straightforward and explicit.
-
----
-
-## 9. CLI Tooling
-
-AStarBot includes a CLI (`cli.py`) for local testing.
-
-The CLI:
-
-* simulates a client-managed memory window
-* updates and stores summaries
-* prints answers directly to stdout
-
-It is useful for:
-
-* prompt tuning
-* retrieval debugging
-* sanity-checking summaries
-* testing fallback behavior
-
----
-
-## 10. Deployment Model
-
-### 10.1 Containerization
-
-* Python 3.12
-* Slim base image
-* Single container
-* No sidecar services
-
-### 10.2 Runtime Characteristics
-
-* Stateless
-* Single worker by default
-* Horizontal scaling supported via platform (e.g. Koyeb)
-
----
-
-## 11. Explicit Non-Goals
-
-AStarBot intentionally does **not** include:
-
-* autonomous agents
-* tool calling
-* web browsing
-* long-term personalization
-* user authentication
-* fine-tuned models
-
-These were excluded to maintain clarity, correctness, and maintainability.
-
----
-
-## 12. What This Project Demonstrates
-
-From an engineering perspective, AStarBot demonstrates:
-
-* practical RAG system design
-* disciplined prompt engineering
-* stateless memory via summarization
-* controlled fallback strategies
-* production-ready API design
-* clear separation of concerns
-
-It is designed to be **understandable, extensible, and defensible**.
-
----
-
-## 13. License
-
-MIT License.
+No agents, tool calling, LangGraph, streaming, auth, server-side sessions, reranking, chunking, or fine-tuning. Complexity is earned, not assumed.

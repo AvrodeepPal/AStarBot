@@ -1,70 +1,154 @@
-# rag/engine.py
+"""Pipeline orchestrator.
 
-import os
-from groq import RateLimitError
-from langchain_groq import ChatGroq
+`RAGEngine.chat` runs seven explicit steps and never raises to the caller:
 
-from rag.retriever import PineconeRetriever
-from rag.prompt import build_prompt, FALLBACK_MESSAGE
+    1. input guardrails      sanitise / bound the request
+    2. regex injection screen
+    3. prompt-guard LLM      fast safe/unsafe classification (optional)
+    4. retrieval             BGE query embedding -> Pinecone top-k
+    5. prompt + LLM chain    primary -> fallback -> static fallback string
+    6. output guardrails     strip leaks, cap length
+    7. summarisation         only when the client window is full
+
+Everything returned is a plain dict {"answer", "updated_summary"} plus an
+optional "debug" block for the CLI/Streamlit interfaces.
+"""
+
+import logging
+import time
+from uuid import uuid4
+
+from rag.config import settings
+from rag.guardrails import GuardrailError, contains_injection, sanitize_answer, validate_chat_input
+from rag.knowledge import context_block
+from rag.llm import LLMChain
 from rag.memory import summarize_conversation
+from rag.prompt import (
+    PROMPT_VERSION,
+    REFUSAL_JAILBREAK,
+    REFUSAL_OFFTOPIC,
+    REFUSAL_UNSAFE,
+    STATIC_FALLBACK,
+    build_messages,
+)
+from rag.retriever import PineconeRetriever
+
+log = logging.getLogger("astarbot.engine")
 
 
 class RAGEngine:
-    def __init__(self):
+    def __init__(self) -> None:
         self.retriever = PineconeRetriever()
-
-        self.primary_llm = ChatGroq(
-            model=os.getenv("PRIMARY_LLM_MODEL"),
-            temperature=float(os.getenv("TEMPERATURE")),
+        self.llm = LLMChain()
+        log.info(
+            "engine_ready",
+            extra={
+                "prompt_version": PROMPT_VERSION,
+                "embedding_model": settings.embedding_model,
+                "top_k": settings.top_k,
+                "primary_model": settings.primary_llm_model,
+            },
         )
-
-        self.fallback_llm = ChatGroq(
-            model=os.getenv("FALLBACK_LLM_MODEL"),
-            temperature=float(os.getenv("TEMPERATURE")),
-        )
-
-        self.max_recent = int(os.getenv("MAX_RECENT_MESSAGES"))
-        self.enable_summary = os.getenv("ENABLE_SUMMARY").lower() == "true"
 
     def chat(
         self,
         question: str,
         recent_messages: list[dict] | None = None,
         summary: str | None = None,
+        include_debug: bool = False,
     ) -> dict:
-        recent_messages = recent_messages or []
-
-        contexts = self.retriever.retrieve(question)
-
-        if not contexts:
-            return {
-                "answer": FALLBACK_MESSAGE,
-                "updated_summary": summary,
-            }
-
-        context_blocks = [c["text"] for c in contexts]
-
-        prompt = build_prompt(
-            context_blocks=context_blocks,
-            conversation_summary=summary,
-            user_question=question,
-        )
-
+        request_id = uuid4().hex[:8]
+        t0 = time.perf_counter()
         try:
-            response = self.primary_llm.invoke(prompt)
-        except RateLimitError:
-            response = self.fallback_llm.invoke(prompt)
+            return self._chat(question, recent_messages or [], summary, request_id, t0, include_debug)
+        except Exception:  # noqa: BLE001 - last line of defence, always logged
+            log.exception("chat_unhandled", extra={"request_id": request_id})
+            return {"answer": STATIC_FALLBACK, "updated_summary": summary}
 
-        answer = response.content.strip()
+    def _chat(
+        self,
+        question: str,
+        recent_messages: list[dict],
+        summary: str | None,
+        request_id: str,
+        t0: float,
+        include_debug: bool,
+    ) -> dict:
+        debug: dict = {"request_id": request_id, "prompt_version": PROMPT_VERSION}
 
-        updated_summary = summary
-        if self.enable_summary and len(recent_messages) >= self.max_recent:
-            updated_summary = summarize_conversation(
-                previous_summary=summary,
-                recent_messages=recent_messages,
+        def done(answer: str, updated_summary: str | None, outcome: str, tier: int | None = None):
+            latency_ms = int((time.perf_counter() - t0) * 1000)
+            log.info(
+                "chat_done",
+                extra={
+                    "request_id": request_id,
+                    "prompt_version": PROMPT_VERSION,
+                    "embedding_model": settings.embedding_model,
+                    "top_k": settings.top_k,
+                    "retrieval_top_score": debug.get("top_score"),
+                    "llm_tier_used": tier,
+                    "outcome": outcome,
+                    "latency_ms": latency_ms,
+                },
             )
+            result = {"answer": answer, "updated_summary": updated_summary}
+            if include_debug:
+                debug.update({"outcome": outcome, "llm_tier": tier, "latency_ms": latency_ms})
+                result["debug"] = debug
+            return result
 
-        return {
-            "answer": answer,
-            "updated_summary": updated_summary,
-        }
+        # 1. input guardrails
+        try:
+            q, msgs, summ = validate_chat_input(question, recent_messages, summary)
+        except GuardrailError as exc:
+            log.info("input_rejected", extra={"request_id": request_id, "reason": str(exc)})
+            return done(STATIC_FALLBACK, summary, "input_rejected")
+        log.debug("question", extra={"request_id": request_id, "q": q})
+
+        # 2. regex injection screen
+        if contains_injection(q):
+            log.info("injection_blocked", extra={"request_id": request_id, "layer": "regex"})
+            return done(REFUSAL_JAILBREAK, summ, "injection_regex")
+
+        # 3. prompt-guard LLM
+        if settings.enable_prompt_guard_llm and not self.llm.check_safe(q, request_id):
+            log.info("injection_blocked", extra={"request_id": request_id, "layer": "prompt_guard"})
+            return done(REFUSAL_UNSAFE, summ, "injection_guard")
+
+        # 4. retrieval
+        contexts = self.retriever.retrieve(q, request_id)
+        debug["sources"] = [
+            {
+                "id": c["id"],
+                "source": c.get("source", ""),
+                "title": c.get("title", ""),
+                "score": round(c["score"], 4),
+                "priority": c.get("priority"),
+                "final_score": round(c.get("final_score", c["score"]), 4),
+            }
+            for c in contexts
+        ]
+        debug["top_score"] = contexts[0]["score"] if contexts else None
+        if not contexts:
+            return done(REFUSAL_OFFTOPIC, summ, "no_context")
+
+        # 5. prompt assembly + LLM chain
+        # Each block carries title + text + links so the model can name the
+        # topic and reuse the URLs; tags/ids stay out of the prompt.
+        messages = build_messages([context_block(c) for c in contexts], summ, q)
+        raw_answer, tier = self.llm.invoke_chat(messages, request_id)
+        if not raw_answer:
+            return done(STATIC_FALLBACK, summ, "llm_failed", tier)
+
+        # 6. output guardrails
+        answer = sanitize_answer(raw_answer)
+        if not answer:
+            return done(STATIC_FALLBACK, summ, "empty_answer", tier)
+
+        # 7. conditional summarisation
+        new_summary = summ
+        if settings.enable_summary and len(msgs) >= settings.summary_trigger_after:
+            new_summary = summarize_conversation(summ, msgs, self.llm, request_id)
+            debug["summarized"] = new_summary != summ
+
+        return done(answer, new_summary, "answered", tier)

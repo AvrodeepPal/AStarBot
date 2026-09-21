@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "source": "projects",
+    "description": "Personal and academic projects with methods, honest results and repo links.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-09-21",
+    "version": 3,
+    "note": "GenAIus work is in experience.json, not here."
+  },
+  "entries": [
+    {
+      "id": "proj-overview",
+      "title": "Projects overview",
+      "text": "My public work falls into groups. Applied ML on messy tabular data: credit risk scoring and transaction fraud detection. NLP research: my MCA thesis on cross-lingual Bengali idiom matching. First-principles learning repos: GPT-2 from scratch, and a reasoning and RL paper library. Tools I needed: an AI recruitment outreach app, and this portfolio with its RAG chatbot. Plus older bachelor's work. Everything is at github.com/AvrodeepPal — ask about any one and I'll go deeper.",
+      "links": ["https://github.com/AvrodeepPal"],
+      "tags": ["projects","portfolio","what have you built","github","repos","overview","work samples","side projects","list of projects"],
+      "aliases": ["what projects has he built","his projects","show me his work"],
+      "priority": 5
+    },
+    {
+      "id": "proj-credit-risk",
+      "title": "Credit Risk Analysis and Loan Approval Prediction",
+      "text": "End-to-end credit risk modelling on 51,336 loan applications with 87 attributes, predicting a four-way risk grade with heavy imbalance. I ranked features with ANOVA F-tests, kept the top 20, and compared eight algorithms with class weights and SMOTE-Tomek. Best: a stacking ensemble at 70.69% macro F1, and XGBoost with class weights at 70.59% macro F1 and 76.21% balanced accuracy. Stacking gave the most even performance across grades, which matters more than headline accuracy when the rare classes are the expensive ones. Full notebook and confusion matrices in the repo.",
+      "links": ["https://github.com/AvrodeepPal/Credit_Risk_Analysis"],
+      "tags": ["credit risk","loan approval","banking","finance","fintech","tabular","classification","imbalanced data","smote","feature selection","anova","ensemble","stacking","xgboost","catboost","scikit-learn","eda","project"],
+      "aliases": ["credit risk project","loan prediction project"],
+      "priority": 4
+    },
+    {
+      "id": "proj-fraud-detection",
+      "title": "Fraud Detection on the IEEE-CIS dataset",
+      "text": "Time-aware transaction fraud detection on 590,540 transactions with 400+ features and only 3.5% fraud. The interesting parts weren't the model: chunked ingestion with numeric downcasting to fit 600MB+ in constrained memory, treating missing device metadata as signal rather than noise, and engineering pseudo-identity, velocity and frequency features. Chronological splits to avoid temporal leakage, PR-AUC as the primary metric. LightGBM hit 0.85 ROC-AUC and ~0.49 PR-AUC; an ensemble pushed PR-AUC to ~0.54. Plus SHAP explainability, cost-sensitive thresholds and PSI drift monitoring.",
+      "links": ["https://github.com/AvrodeepPal/Fraud_Detection_Analysis"],
+      "tags": ["fraud detection","ieee-cis","anomaly detection","imbalanced data","pr-auc","lightgbm","xgboost","catboost","ensemble","shap","explainability","feature engineering","drift detection","psi","threshold tuning","temporal leakage","finance","project"],
+      "aliases": ["fraud detection project","his fraud project"],
+      "priority": 4
+    },
+    {
+      "id": "proj-bengali-idioms",
+      "title": "Cross-Lingual Bengali Idiom Matching (MCA thesis)",
+      "text": "My MCA thesis with Ankana Saha and Shahmeer Mondal under Prof. Diganta Saha. Can multilingual embedding models match equivalent idioms across Bengali, English and Hindi with no translation step? We built a triplet dataset of 9,061 Bengali-English and 4,096 Bengali-Hindi pairs and compared mSBERT, LaBSE, BanglaBERT and XLM-RoBERTa on similarity, retrieval and clustering. Honest answer: none of them can do it. Best precision@1 was LaBSE at 0.0055. The finding I'm proud of is diagnosing embedding collapse in XLM-R — a near-perfect 0.993 mean cosine with 0.003 standard deviation, so the score was an artifact, not a result.",
+      "links": ["https://github.com/AvrodeepPal/Cross-Lingual-Bengali-Idiom-Matching-Using-Multilingual-Sentence-Embeddings-Without-Translation"],
+      "tags": ["thesis","mca thesis","research","nlp","bengali","bangla","hindi","idioms","figurative language","cross-lingual","multilingual","sentence embeddings","labse","msbert","banglabert","xlm-r","embedding collapse","retrieval","mrr","clustering","evaluation","negative result","jadavpur","project"],
+      "aliases": ["his thesis","mca thesis","bengali idiom project","research project"],
+      "priority": 5
+    },
+    {
+      "id": "proj-reasoning-sandbox",
+      "title": "Reasoning under constrained GPUs (current research)",
+      "text": "My current side project, on free Kaggle dual-T4 GPUs. The question: does RL post-training make test-time search less useful? If GRPO sharpens what a model could already find rather than teaching new solutions, then best-of-N and step-level MCTS should buy less on top of an RL-tuned model than the base one. That's a compute-allocation question with a real answer — for a fixed budget, train or sample? Measured on procedurally generated puzzles so the task is contamination-free, reporting full pass@k curves rather than single accuracy numbers.",
+      "links": ["https://github.com/AvrodeepPal/ReasoningPractice"],
+      "tags": ["research","side project","reasoning","grpo","rl","test time compute","search","mcts","best of n","pass@k","benchmarking","kaggle","t4","dual gpu","small models","current project","in progress"],
+      "aliases": ["his current research","reasoning project","what is he researching"],
+      "priority": 5,
+      "last_verified": "2026-09-21"
+    },
+    {
+      "id": "proj-llms-practice",
+      "title": "LLMsPractice — GPT-2 from scratch",
+      "text": "A first-principles repo where I built the transformer stack from raw tensor operations. It walks from character-level RNNs and LSTMs through custom BPE, token and positional embeddings, scaled dot-product attention, causal masking, multi-head attention, a full GPT-2 decoder block, a pretraining loop, loading official OpenAI GPT-2 checkpoints into my own modules, and classification and instruction fine-tuning. Plus 54 markdown write-ups on the building blocks. This is the repo I'd point to if someone wants to know whether I understand attention or just import it.",
+      "links": ["https://github.com/AvrodeepPal/LLMsPractice"],
+      "tags": ["llm","gpt","gpt-2","transformer","attention","multi head attention","causal attention","tokenization","bpe","pretraining","fine tuning","instruction tuning","pytorch","from scratch","first principles","raschka","learning","project"],
+      "aliases": ["gpt from scratch","llms practice repo","did he build a transformer"],
+      "priority": 4
+    },
+    {
+      "id": "proj-reasoning-practice",
+      "title": "ReasoningPractice — RL and reasoning library",
+      "text": "A paper library plus my own notes tracing how LLMs learn to reason, in three layers: classical RL foundations (Sutton and Barto, policy gradient, TRPO), prompting and test-time compute (chain-of-thought, inference-time scaling), and the DeepSeek family — R1, V3, and notes on how MoE and multi-head latent attention map onto vLLM's serving engine and PagedAttention. A literature and synthesis archive rather than a codebase.",
+      "links": ["https://github.com/AvrodeepPal/ReasoningPractice"],
+      "tags": ["reasoning","reinforcement learning","rl","grpo","ppo","trpo","chain of thought","test time compute","deepseek","deepseek r1","vllm","pagedattention","kv cache","moe","papers","notes","research","project"],
+      "aliases": ["reasoning practice repo","his paper notes"],
+      "priority": 3
+    },
+    {
+      "id": "proj-python-practice",
+      "title": "PythonPractice — core Python, CUDA and security notes",
+      "text": "A topic-organised reference notebook rather than a single project: core Python idioms, Pandas and NumPy notes with diagrams, CUDA GPU programming coursework from NPTEL, and Model Context Protocol notes. The piece I wrote from scratch is a technical deep dive on the OWASP Top 10 for LLM Applications — each vulnerability class with problem statements, attacker profiles and mitigations.",
+      "links": ["https://github.com/AvrodeepPal/PythonPractice"],
+      "tags": ["python","notes","reference","pandas","numpy","cuda","gpu programming","nptel","mcp","model context protocol","owasp","owasp llm","prompt injection","security","learning","project"],
+      "aliases": ["python practice repo","his owasp writeup"],
+      "priority": 2
+    },
+    {
+      "id": "proj-astarbot",
+      "title": "AStarBot — this portfolio and chatbot",
+      "text": "The site you're on. React and Tailwind frontend, FastAPI backend, and this chat runs on a RAG pipeline — my background is chunked into a vector store, your question retrieves the relevant pieces, and a model answers from those rather than from its own guesses. Built so that when I don't have something on file it says so instead of inventing an answer, which is harder to get right than it sounds.",
+      "links": ["https://avrodeeppal-portfolio.vercel.app", "https://github.com/AvrodeepPal"],
+      "tags": ["astarbot","portfolio","chatbot","this chatbot","how were you built","how does this work","rag","vector database","pinecone","embeddings","fastapi","react","tailwind","full stack","project"],
+      "aliases": ["how was this chatbot built","what powers this bot","how does this site work"],
+      "priority": 5
+    },
+    {
+      "id": "proj-letsconnect",
+      "title": "Let's Connect — AI recruitment outreach tool",
+      "text": "A Streamlit app built for the JU MCA 2024-26 placement cell while I was coordinating it. It generates personalised recruiter outreach emails tailored to a company's industry and hiring focus, instead of the generic template blast campus placement usually runs on. OTP login, editable previews, Supabase for sessions, a Mistral-based model for generation, Gmail SMTP for delivery. It was actually used by our placement team during the season, which is the part I care about.",
+      "links": ["https://github.com/AvrodeepPal/LetsConnect", "https://letsconnect-jumca2026.streamlit.app"],
+      "tags": ["lets connect","placement","recruitment","email generation","outreach","streamlit","mistral","llm","supabase","otp","smtp","web app","jadavpur","ju mca","prompt engineering","project"],
+      "aliases": ["lets connect project","placement tool"],
+      "priority": 3
+    },
+    {
+      "id": "proj-lstm-stocks",
+      "title": "Stock Forecasting with LSTM (B.Sc. project)",
+      "text": "My bachelor's final-year project with Chitranku Sarkar and Subhodeep Saha. Tesla prices resampled weekly, seasonally decomposed into trend, seasonal and residual, with a separate LSTM trained per component and the predictions recombined. A companion notebook compares ReLU against GELU. Reported 75.25% on the within-10% hit rate. I'd do it differently now — the decomposition was multiplicative but components were added back, and the error metrics compared the reconstructed price against the trend alone, so the numbers don't measure what they claim. A good lesson in how quietly an evaluation pipeline goes wrong.",
+      "links": ["https://github.com/AvrodeepPal/Time_Series_Analysis_LSTM"],
+      "tags": ["lstm","stock prediction","time series","forecasting","seasonal decomposition","tesla","rnn","gelu","relu","tensorflow","keras","bachelors project","bsc project","wbsu","deep learning","mistakes","lessons learned","project"],
+      "aliases": ["lstm project","stock prediction project","his bsc project"],
+      "priority": 3
+    },
+    {
+      "id": "proj-star-emporium",
+      "title": "Star Emporium — ebook store (B.Sc. group project)",
+      "text": "An ebook store in Java Swing with a MySQL backend over JDBC, built with Indrasish Biswas, Snehargha Mukherjee and Tamonash Sarkar. Registration and login, searchable catalogue, cart with price calculation, order history, and in-app reading with bookmarking. Early work, firmly desktop-Java era, but where I learned database schema design and how much of an application is plumbing rather than features.",
+      "links": ["https://github.com/AvrodeepPal/Star_Emporium"],
+      "tags": ["star emporium","java","java swing","desktop application","mysql","jdbc","database","sql","crud","ebook","bookstore","group project","bsc project","project"],
+      "aliases": ["star emporium","his java project"],
+      "priority": 2
+    },
+    {
+      "id": "proj-collaborators",
+      "title": "People I've built with",
+      "text": "Mostly solo work, but not entirely. The Bengali idiom thesis was with Ankana Saha and Shahmeer Mondal under Prof. Diganta Saha. The LSTM stock project was with Chitranku Sarkar and Subhodeep Saha. Star Emporium was with Indrasish Biswas, Snehargha Mukherjee and Tamonash Sarkar. Placement coordination at JU MCA was with Chitranku Sarkar and Pratik Kotal. Working with people willing to disagree with you is what made each of those better than what I'd have shipped alone.",
+      "links": [],
+      "tags": ["collaborators","team","co-authors","worked with","teammates","group projects","people"],
+      "aliases": ["who has he worked with","his collaborators","team projects"],
+      "priority": 2
+    },
+    {
+      "id": "proj-lessons",
+      "title": "Lessons from building things",
+      "text": "Patterns that keep recurring. Evaluation is harder than modelling — my LSTM project reported numbers that didn't measure what they claimed and I didn't catch it for a long time. Data engineering is most of the job: deduplicating 134,685 images mattered more than the architecture choice. Small specialised models can beat large general ones on narrow domains. And an honest negative result is worth more than a flattering positive one — the idiom thesis reported that no model could do the task, and that's the version I'm proud of.",
+      "links": [],
+      "tags": ["lessons","learnings","insights","what have you learned","reflections","evaluation","data engineering","negative results","mistakes"],
+      "aliases": ["what has he learned","lessons learned","biggest takeaways"],
+      "priority": 3
+    }
+  ]
+}
