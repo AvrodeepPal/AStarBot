@@ -2,33 +2,26 @@
 
 import os
 from dotenv import load_dotenv
-import pinecone
+from pinecone import Pinecone as PineconeClient
 from sentence_transformers import SentenceTransformer
 
 load_dotenv()
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_ENV = os.getenv("PINECONE_ENV")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
-TOP_K = int(os.getenv("TOP_K_RETRIEVAL", 3))
+TOP_K = int(os.getenv("TOP_K_RETRIEVAL"))
 
-NAMESPACE = "astarbot"
+NAMESPACE = os.getenv("PINECONE_INDEX_NAME")
 
-EMBEDDING_MODEL = os.getenv(
-    "EMBEDDING_MODEL",
-    "sentence-transformers/all-MiniLM-L6-v2"
-)
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 
 
 class PineconeRetriever:
     def __init__(self):
         self.embedder = SentenceTransformer(EMBEDDING_MODEL)
 
-        pinecone.init(
-            api_key=PINECONE_API_KEY,
-            environment=PINECONE_ENV,
-        )
-        self.index = pinecone.Index(PINECONE_INDEX_NAME)
+        self.pc = PineconeClient(api_key=PINECONE_API_KEY)
+        self.index = self.pc.Index(PINECONE_INDEX_NAME)
 
     def retrieve(self, query: str) -> list[dict]:
         query_vector = self.embedder.encode(query).tolist()

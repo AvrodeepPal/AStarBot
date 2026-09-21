@@ -11,6 +11,6 @@ if __name__ == "__main__":
         "api:app",
         host=host,
         port=port,
-        reload=False,        # MUST be False in production
+        reload=False,
         log_level="info",
     )

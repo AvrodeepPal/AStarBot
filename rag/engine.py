@@ -15,16 +15,16 @@ class RAGEngine:
 
         self.primary_llm = ChatGroq(
             model=os.getenv("PRIMARY_LLM_MODEL"),
-            temperature=float(os.getenv("TEMPERATURE", 0.4)),
+            temperature=float(os.getenv("TEMPERATURE")),
         )
 
         self.fallback_llm = ChatGroq(
             model=os.getenv("FALLBACK_LLM_MODEL"),
-            temperature=float(os.getenv("TEMPERATURE", 0.4)),
+            temperature=float(os.getenv("TEMPERATURE")),
         )
 
-        self.max_recent = int(os.getenv("MAX_RECENT_MESSAGES", 6))
-        self.enable_summary = os.getenv("ENABLE_SUMMARY", "true").lower() == "true"
+        self.max_recent = int(os.getenv("MAX_RECENT_MESSAGES"))
+        self.enable_summary = os.getenv("ENABLE_SUMMARY").lower() == "true"
 
     def chat(
         self,
