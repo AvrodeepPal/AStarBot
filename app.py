@@ -13,7 +13,7 @@ st.set_page_config(
 
 st.title("AStarBot")
 st.caption("Avrodeep Pal's personal AI assistant")
-st.info("**Beta Preview**: This AI is experimental and may produce inaccurate information. Please verify details independently.")
+st.info("**Beta Preview**: This AI is experimental and may produce inaccurate information. For any good or bad qualities found, please feel free to contact and positively share your reviews. Thank you!")
 
 # Load RAG engine once per session
 @st.cache_resource
