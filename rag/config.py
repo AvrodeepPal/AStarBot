@@ -1,9 +1,12 @@
 """Typed runtime configuration.
 
 Every environment variable the application reads is declared here, once.
-`Settings()` is instantiated at import time so a missing required key
-(`PINECONE_API_KEY`, `GROQ_API_KEY`) fails fast at startup rather than
-deep inside a request.
+`Settings()` is instantiated at import time. `PINECONE_API_KEY` and
+`GROQ_API_KEY` default to "" so this module (and anything that only needs
+client-side constants, like `interfaces.session`) can be imported without
+those secrets — e.g. the Streamlit UI, which talks to the API over HTTP and
+never touches Pinecone/Groq directly. Code that actually calls those
+services (`rag.retriever`, `rag.llm`) still fails fast if the key is blank.
 
 Values are read from the process environment first, then from a `.env`
 file in the working directory. Field names map to upper-cased env vars
@@ -23,7 +26,7 @@ class Settings(BaseSettings):
     )
 
     # ---- Pinecone --------------------------------------------------------
-    pinecone_api_key: str
+    pinecone_api_key: str = ""
     pinecone_index_name: str = "astarbot"
     pinecone_namespace: str = "astarbot"
 
@@ -63,7 +66,7 @@ class Settings(BaseSettings):
     mmr_lambda: float = 0.7
 
     # ---- Groq LLM tiers --------------------------------------------------
-    groq_api_key: str
+    groq_api_key: str = ""
     guard_model: str = "meta-llama/llama-prompt-guard-2-86m"
     primary_llm_model: str = "openai/gpt-oss-120b"
     fallback_llm_model: str = "openai/gpt-oss-20b"

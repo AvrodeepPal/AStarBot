@@ -150,12 +150,14 @@ One JSON object per line (`rag/log.py`). `chat_done` records carry `request_id`,
 ├── data/*.json                knowledge base (self, experience, projects, studies, personality, faq)
 ├── tests/                     offline unit + API tests
 ├── Dockerfile · .dockerignore · Makefile · pyproject.toml · .env.example
+├── requirements.txt            full deps (Railway/Docker/local dev) -> pyproject.toml
+├── requirements-streamlit.txt  minimal deps (Streamlit Cloud): requests + streamlit + pydantic
 ```
 
 ## Deployment
 
-- **Railway / Docker**: `docker build -t astarbot .` — multi-stage, CPU-only torch, model baked in, non-root, healthcheck on `/health`. Set env vars from `.env.example` in the dashboard (`PORT` is injected). `--build-arg PREFETCH_MODEL=false` shrinks the image if cold-start downloads are acceptable.
-- **Streamlit Community Cloud**: main file `interfaces/streamlit_app.py`; put env vars in *Secrets* (they are bridged into the environment). `requirements.txt` points pip at `pyproject.toml` with the CPU torch index.
+- **Railway / Docker** (runs the API): `docker build -t astarbot .` — multi-stage, CPU-only torch, model baked in, non-root, healthcheck on `/health`. Set env vars from `.env.example` in the dashboard (`PORT` is injected). `--build-arg PREFETCH_MODEL=false` shrinks the image if cold-start downloads are acceptable.
+- **Streamlit Community Cloud** (runs the UI): main file `interfaces/streamlit_app.py`. It's a thin HTTP client against the Railway API — it never loads the embedding model, so it fits the platform's 1 GB free tier. Put `ASTARBOT_API_URL = "https://<your-railway-domain>"` in *Secrets*; it's bridged into the environment at startup. In Advanced settings, point Python dependencies at `requirements-streamlit.txt` instead of `requirements.txt` (the latter pulls in torch/sentence-transformers via `-e .` and will OOM here).
 - **Frontend**: set `FRONTEND_ORIGIN` to the portfolio origin(s), comma-separated.
 
 ## What this project intentionally does not do

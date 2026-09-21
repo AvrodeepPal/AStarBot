@@ -1,0 +1,20 @@
+# Minimal dependency set for the Streamlit Community Cloud deployment.
+#
+# The Streamlit app is a thin HTTP client against the AStarBot API (run on
+# Railway) — it no longer loads the embedding model or an LLM client
+# in-process, so it doesn't need torch, sentence-transformers, pinecone, or
+# langchain-groq. requirements.txt (-e . / pyproject.toml) pulls all of those
+# in and will OOM on Streamlit Cloud's 1 GB free tier.
+#
+# In Streamlit Cloud: Advanced settings -> Python dependencies -> point at
+# this file instead of requirements.txt.
+#
+# pydantic / pydantic-settings / python-dotenv back rag.config.Settings,
+# which interfaces.session imports for the client-side message-window sizes
+# (MAX_RECENT_MESSAGES, MESSAGES_AFTER_SUMMARY). No API keys are required for
+# that import — see rag/config.py.
+requests>=2.31.0
+streamlit>=1.33.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0

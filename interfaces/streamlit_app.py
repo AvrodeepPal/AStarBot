@@ -2,14 +2,22 @@
 
     streamlit run interfaces/streamlit_app.py
 
+This talks to the AStarBot API (deployed on Railway) over HTTP rather than
+instantiating RAGEngine in-process: the embedding model + torch don't fit in
+Streamlit Community Cloud's 1 GB RAM cap, and the whole point of the split is
+to run the engine on Railway. Point ASTARBOT_API_URL at the deployed API via
+Streamlit secrets; it falls back to a local FastAPI instance for dev.
+
 On Streamlit Community Cloud, secrets are exposed via `st.secrets`; they are
-copied into the environment below so `rag.config.Settings` picks them up.
+copied into the environment below so `ASTARBOT_API_URL` is visible to
+`os.environ.get`.
 """
 
 import os
 import sys
 from pathlib import Path
 
+import requests
 import streamlit as st
 
 # Streamlit puts the script's directory on sys.path, not the repo root.
@@ -25,38 +33,62 @@ except Exception:  # noqa: BLE001
     pass
 
 from interfaces.session import trim_window  # noqa: E402
-from rag.config import settings  # noqa: E402
-from rag.engine import RAGEngine  # noqa: E402
-from rag.log import setup_logging  # noqa: E402
-from rag.prompt import INITIAL_MESSAGE, PROMPT_VERSION  # noqa: E402
 
 st.set_page_config(page_title="AStarBot", page_icon="⭐", layout="centered")
 
+API_BASE = os.environ.get("ASTARBOT_API_URL", "http://localhost:8000").rstrip("/")
 
-@st.cache_resource(show_spinner="Loading AStarBot (embedding model + vector index)…")
-def load_engine() -> RAGEngine:
-    setup_logging(settings.log_level)
-    return RAGEngine()
+# Used only if the API is unreachable when the page first loads; once /version
+# answers, the real prompt-defined greeting takes over.
+FALLBACK_INITIAL_MESSAGE = (
+    "Hi there! I'm AStarBot, Avrodeep's AI assistant, here to chat in his stead "
+    "while he's offline. Ask me about his education, projects, skills, or what "
+    "he's into outside of code. How about we start with a quick intro?"
+)
+
+
+def call_chat(question: str, recent_messages: list[dict], summary: str | None) -> dict:
+    r = requests.post(
+        f"{API_BASE}/chat",
+        json={"question": question, "recent_messages": recent_messages, "summary": summary},
+        timeout=60,
+    )
+    r.raise_for_status()
+    return r.json()  # {"answer": ..., "updated_summary": ...}
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def fetch_version() -> dict | None:
+    try:
+        r = requests.get(f"{API_BASE}/version", timeout=10)
+        r.raise_for_status()
+        return r.json()
+    except requests.RequestException:
+        return None
+
+
+version_info = fetch_version()
+initial_message = (version_info or {}).get("initial_message", FALLBACK_INITIAL_MESSAGE)
 
 
 def reset_conversation() -> None:
-    st.session_state.messages = [{"role": "assistant", "content": INITIAL_MESSAGE}]
+    st.session_state.messages = [{"role": "assistant", "content": initial_message}]
     st.session_state.summary = None
 
 
 # ---- sidebar -------------------------------------------------------------
 with st.sidebar:
     st.header("AStarBot v2 · beta")
-    st.markdown(
-        f"- **Prompt:** `{PROMPT_VERSION}`\n"
-        f"- **Primary LLM:** `{settings.primary_llm_model}`\n"
-        f"- **Fallback LLM:** `{settings.fallback_llm_model}`\n"
-        f"- **Embeddings:** `{settings.embedding_model}` ({settings.embedding_dim}-d)\n"
-        f"- **Retrieval:** top-k = {settings.top_k}\n"
-        f"- **Guard model:** `{settings.guard_model}`"
-        + ("" if settings.enable_prompt_guard_llm else " (off)")
-    )
-    show_debug = st.toggle("Show retrieval debug", value=settings.debug)
+    if version_info:
+        st.markdown(
+            f"- **Prompt:** `{version_info['prompt_version']}`\n"
+            f"- **Primary LLM:** `{version_info['primary_model']}`\n"
+            f"- **Fallback LLM:** `{version_info['fallback_model']}`\n"
+            f"- **Embeddings:** `{version_info['embedding_model']}` ({version_info['embedding_dim']}-d)\n"
+            f"- **Retrieval:** top-k = {version_info['top_k']}"
+        )
+    else:
+        st.warning(f"Can't reach the AStarBot API at `{API_BASE}`.")
     if st.button("Clear conversation", use_container_width=True):
         reset_conversation()
         st.rerun()
@@ -73,8 +105,6 @@ st.info(
     "share your reviews. Thank you!"
 )
 
-engine = load_engine()
-
 if "messages" not in st.session_state:
     reset_conversation()
 
@@ -87,21 +117,24 @@ if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
 
+    result = None
     with st.chat_message("assistant"):
         with st.spinner("Thinking…"):
-            result = engine.chat(
-                question=user_input,
-                recent_messages=st.session_state.messages,
-                summary=st.session_state.summary,
-                include_debug=show_debug,
-            )
-        st.markdown(result["answer"])
-        if show_debug and "debug" in result:
-            st.json(result["debug"], expanded=False)
+            try:
+                result = call_chat(
+                    question=user_input,
+                    recent_messages=st.session_state.messages,
+                    summary=st.session_state.summary,
+                )
+            except requests.RequestException as exc:
+                st.error(f"Couldn't reach AStarBot's API: {exc}")
+        if result:
+            st.markdown(result["answer"])
 
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    st.session_state.messages.append({"role": "assistant", "content": result["answer"]})
-    st.session_state.messages = trim_window(
-        st.session_state.messages, st.session_state.summary, result["updated_summary"]
-    )
-    st.session_state.summary = result["updated_summary"]
+    if result:
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        st.session_state.messages.append({"role": "assistant", "content": result["answer"]})
+        st.session_state.messages = trim_window(
+            st.session_state.messages, st.session_state.summary, result["updated_summary"]
+        )
+        st.session_state.summary = result["updated_summary"]
