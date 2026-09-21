@@ -11,6 +11,7 @@ noticeably degrades recall, so the prefix lives in exactly one place here.
 
 import logging
 
+import numpy as np
 from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
 
@@ -34,7 +35,9 @@ def load_embedder() -> SentenceTransformer:
         extra={"model": settings.embedding_model, "device": settings.embedding_device},
     )
     model = SentenceTransformer(settings.embedding_model, device=settings.embedding_device)
-    dim = model.get_sentence_embedding_dimension()
+    # Renamed upstream; keep the old name as a fallback for older installs.
+    get_dim = getattr(model, "get_embedding_dimension", None) or model.get_sentence_embedding_dimension
+    dim = get_dim()
     if dim != settings.embedding_dim:
         raise RuntimeError(
             f"Embedding model produces {dim}-d vectors but EMBEDDING_DIM={settings.embedding_dim}; "
@@ -60,23 +63,27 @@ class PineconeRetriever:
     def retrieve(self, query: str, request_id: str = "-") -> list[dict]:
         """Return up to top_k matches, best first.
 
-        Three stages, because Pinecone can only do the first one:
+        Four stages, because Pinecone can only do the first one:
           1. vector search for `fetch_k` candidates (over-fetch)
           2. drop anything below `min_retrieval_score` on the RAW cosine score,
              which is the quantity the threshold was calibrated against
-          3. re-rank by `cosine + priority_weight * priority` and keep `top_k`,
-             so an editorially important entry wins a near-tie
+          3. re-rank by `cosine + priority_weight * priority`, so an
+             editorially important entry wins a near-tie
+          4. MMR selection down to `top_k` (`mmr_lambda` < 1.0), so the FAQ
+             copy of a fact does not crowd out a different, useful entry
 
         Each result carries {id, title, text, links, tags, source, priority,
         score, final_score}. Pinecone errors are logged and yield an empty
         list; the engine maps that to a refusal rather than raising.
         """
+        use_mmr = settings.mmr_lambda < 1.0
         try:
             vec = self._embed_query(query)
             res = self.index.query(
                 vector=vec,
                 top_k=max(settings.fetch_k, settings.top_k),
                 include_metadata=True,
+                include_values=use_mmr,
                 namespace=settings.pinecone_namespace,
             )
         except Exception as exc:  # noqa: BLE001
@@ -102,11 +109,17 @@ class PineconeRetriever:
                     "priority": priority,
                     "score": score,
                     "final_score": score + settings.priority_weight * priority,
+                    "_values": _field(m, "values", None) if use_mmr else None,
                 }
             )
 
         candidates.sort(key=lambda r: r["final_score"], reverse=True)
-        results = candidates[: settings.top_k]
+        if use_mmr:
+            results = _mmr_select(candidates, settings.top_k, settings.mmr_lambda)
+        else:
+            results = candidates[: settings.top_k]
+        for c in candidates:
+            c.pop("_values", None)
 
         log.info(
             "retrieval",
@@ -121,3 +134,34 @@ class PineconeRetriever:
             },
         )
         return results
+
+
+def _mmr_select(candidates: list[dict], k: int, lam: float) -> list[dict]:
+    """Greedy maximal marginal relevance over already-sorted candidates.
+
+    Relevance is `final_score` (cosine + priority); redundancy is the cosine
+    between candidate vectors, which Pinecone returned alongside the match.
+    If any candidate lacks a vector (older SDK, `include_values` ignored) the
+    function degrades to plain top-k so retrieval never fails on this step.
+    """
+    if len(candidates) <= k:
+        return candidates
+    vectors = [c.get("_values") for c in candidates]
+    if any(v is None or len(v) == 0 for v in vectors):
+        return candidates[:k]
+
+    mat = np.asarray(vectors, dtype="float32")
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    mat = mat / np.where(norms == 0, 1.0, norms)
+    sim = mat @ mat.T
+    rel = np.asarray([c["final_score"] for c in candidates], dtype="float32")
+
+    picked: list[int] = [0]  # the best candidate is always in
+    remaining = list(range(1, len(candidates)))
+    while remaining and len(picked) < k:
+        redundancy = sim[np.ix_(remaining, picked)].max(axis=1)
+        mmr = lam * rel[remaining] - (1.0 - lam) * redundancy
+        best = remaining[int(np.argmax(mmr))]
+        picked.append(best)
+        remaining.remove(best)
+    return [candidates[i] for i in picked]

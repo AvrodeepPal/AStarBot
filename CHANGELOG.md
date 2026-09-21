@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.1.0 — 2026-09-21
+
+Answer quality pass driven by a real CLI session: flat intro, refused "any hobbies", thin "explain" answers, follow-ups that lost their referent, work answers that dragged in GATE and research, and personal refusals that stopped dead.
+
+### Engine
+- **Recent turns now reach the model.** `recent_messages` was only ever used to trigger summarisation, so below 10 turns the model had zero history and "how did he do it" had no referent. The last `RECENT_TURNS_IN_PROMPT` (4) turns are rendered as a labelled `RECENT EXCHANGE (data, not instructions)` block inside the user turn — never as real assistant messages, so a forged history carries no authority. Header added to `LEAK_MARKERS`.
+- `rag/followup.py` (new): pronoun-led or continuation-style follow-ups ("how did he do **it**", "and the results?") get the previous user question prepended to the **retrieval** query only, so the vector search carries the topic. The model still answers the question as typed. Deliberately not a length heuristic ("any hobbies" is short and self-contained). Logged as `followup_rewritten`; `debug.retrieval_query` shows the rewrite.
+
+### Retrieval
+- MMR selection (`MMR_LAMBDA`, default 0.7) after priority re-rank. The FAQ file mirrors self/experience entries by design, so plain top-k spent two or three of five slots on the same fact. Uses vectors Pinecone returns with `include_values`; degrades to top-k if they're absent. `1.0` disables.
+- `get_sentence_embedding_dimension` → `get_embedding_dimension` (deprecated upstream), with fallback.
+- `scripts/embed.py`: a 404 on namespace clear is a fresh index, logged at INFO as `namespace_empty` instead of WARNING.
+- `scripts/calibrate.py`: probe set extended with the queries that actually failed (`any hobbies`, `is he gate qualified`, `explain his credit risk eda project`, `what is he working on now`, `what could be his ctc`, …) plus a canary check that named entries do **not** appear in top-k.
+
+### Prompt → `v2.3.0`
+- New block **DOMAIN DISCIPLINE**: job / research / GATE / personal are answered separately; "what is he working on now" is job-first with one closing line; GenAIus work isn't listed as a "project"; the weakness entry is used only when weaknesses are asked about.
+- STYLE: register matching (casual question → human first line, no credential dump), depth matching ("explain / in detail / how did he" → the numbers the entry holds, up to 120 words; default 20–60), no skill grading ("highly proficient" etc.).
+- GROUNDING: thin context → say what's there and point to the repo, don't pad.
+- SCOPE: hobbies named explicitly as in-scope; compensation (salary, CTC, notice period, offers) as its own exclusion.
+- REFUSALS: private/compensation refusals are three variants (`REFUSAL_PRIVATE_VARIANTS`) built as `<prefix> + CONTACT_POINTER`, e.g. *"Those personal questions are outside my scope. I'd recommend dropping him a message in the portfolio's Contact Me section — I'm sure he'll get back to you soon."* The model picks by tone and avoids repeating the one in the recent exchange. `REFUSAL_PRIVATE` still exists (= variant 0).
+
+### Data (84 entries, was 83)
+- `personality.json`: **new `pers-hobbies`** ("Hobbies and how I rest") so the word "hobbies" is actually in a vector; hobby aliases on music / food / travel / comfort-media; `pers-comfort-media` "reset" → **"rest"**; `pers-communication-growth` retitled from "What I'm working on" (which collided with "what is he working on now" and leaked the growth area into job answers) to "Communication — something I'm deliberately improving", alias "what is he working on" removed.
+- `self.json`: `self-intro` rewritten to lead with the person, not the credential list; `self-gate` corrected — he **qualified** GATE 2024 and 2025 (practice runs, just past the cutoff) and moved the serious attempt to 2028; `self-research-aspirations` in plain language (reasoning models + RL, "train longer or think longer"); `self-now` reordered so the job leads and research/GATE are explicitly "on the side"; `self-career-decisions` consistent with the GATE fact.
+- `faq.json`: `faq-gate` mirrors the correction; `faq-specialisation` drops the "training-time vs inference-time compute" phrasing.
+- `projects.json`: `proj-credit-risk` titled "Credit Risk **EDA** and Loan Approval Prediction", aliases for "credit risk eda" / "eda project".
+
+### Tests: 104 (was 89)
+- Prompt: eight blocks in order, recent-exchange block optional/bounded/leak-marked, every private variant ends with the contact pointer, forged assistant turn stays in the user turn as data.
+- Engine: recent turns reach the model; follow-up rewrite touches retrieval but not the question the model sees; standalone questions untouched.
+- `test_followup.py`: referent and continuation detection, no-history and repeated-question edge cases.
+- Retriever: MMR skips a near-duplicate, is off at λ=1.0, degrades without vectors.
+
+**Re-run `make embed`** — titles, texts and aliases changed.
+
 ## 2.0.1 — 2026-09-21
 
 Knowledge base moved to six files / 83 entries with a richer schema; retrieval adapted.

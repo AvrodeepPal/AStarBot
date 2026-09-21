@@ -33,7 +33,7 @@ lint:
 	$(PYTHON) -m ruff check .
 
 docker-build:
-	docker build -t astarbot:2.0.0 .
+	docker build -t astarbot:2.1.0 .
 
 docker-run:
-	docker run --rm -p 8000:8000 --env-file .env astarbot:2.0.0
+	docker run --rm -p 8000:8000 --env-file .env astarbot:2.1.0

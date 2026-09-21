@@ -4,7 +4,7 @@
     "description": "Personal and academic projects with methods, honest results and repo links.",
     "owner": "Avrodeep Pal",
     "last_updated": "2026-09-21",
-    "version": 3,
+    "version": 4,
     "note": "GenAIus work is in experience.json, not here."
   },
   "entries": [
@@ -19,11 +19,11 @@
     },
     {
       "id": "proj-credit-risk",
-      "title": "Credit Risk Analysis and Loan Approval Prediction",
+      "title": "Credit Risk EDA and Loan Approval Prediction",
       "text": "End-to-end credit risk modelling on 51,336 loan applications with 87 attributes, predicting a four-way risk grade with heavy imbalance. I ranked features with ANOVA F-tests, kept the top 20, and compared eight algorithms with class weights and SMOTE-Tomek. Best: a stacking ensemble at 70.69% macro F1, and XGBoost with class weights at 70.59% macro F1 and 76.21% balanced accuracy. Stacking gave the most even performance across grades, which matters more than headline accuracy when the rare classes are the expensive ones. Full notebook and confusion matrices in the repo.",
       "links": ["https://github.com/AvrodeepPal/Credit_Risk_Analysis"],
       "tags": ["credit risk","loan approval","banking","finance","fintech","tabular","classification","imbalanced data","smote","feature selection","anova","ensemble","stacking","xgboost","catboost","scikit-learn","eda","project"],
-      "aliases": ["credit risk project","loan prediction project"],
+      "aliases": ["credit risk project","loan prediction project","credit risk eda","eda project","loan approval eda","explain his credit risk project"],
       "priority": 4
     },
     {

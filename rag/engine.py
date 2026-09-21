@@ -1,14 +1,17 @@
 """Pipeline orchestrator.
 
-`RAGEngine.chat` runs seven explicit steps and never raises to the caller:
+`RAGEngine.chat` runs eight explicit steps and never raises to the caller:
 
     1. input guardrails      sanitise / bound the request
     2. regex injection screen
     3. prompt-guard LLM      fast safe/unsafe classification (optional)
-    4. retrieval             BGE query embedding -> Pinecone top-k
-    5. prompt + LLM chain    primary -> fallback -> static fallback string
-    6. output guardrails     strip leaks, cap length
-    7. summarisation         only when the client window is full
+    4. follow-up rewrite     "how did he do it" -> "<previous question> how did he do it"
+                             for RETRIEVAL only; the model answers the question as typed
+    5. retrieval             BGE query embedding -> Pinecone top-k (+ MMR)
+    6. prompt + LLM chain    primary -> fallback -> static fallback string;
+                             the last few turns ride in the user prompt as data
+    7. output guardrails     strip leaks, cap length
+    8. summarisation         only when the client window is full
 
 Everything returned is a plain dict {"answer", "updated_summary"} plus an
 optional "debug" block for the CLI/Streamlit interfaces.
@@ -19,6 +22,7 @@ import time
 from uuid import uuid4
 
 from rag.config import settings
+from rag.followup import standalone_query
 from rag.guardrails import GuardrailError, contains_injection, sanitize_answer, validate_chat_input
 from rag.knowledge import context_block
 from rag.llm import LLMChain
@@ -115,8 +119,14 @@ class RAGEngine:
             log.info("injection_blocked", extra={"request_id": request_id, "layer": "prompt_guard"})
             return done(REFUSAL_UNSAFE, summ, "injection_guard")
 
-        # 4. retrieval
-        contexts = self.retriever.retrieve(q, request_id)
+        # 4. follow-up rewrite (retrieval only)
+        retrieval_q = standalone_query(q, msgs)
+        if retrieval_q != q:
+            log.info("followup_rewritten", extra={"request_id": request_id})
+            debug["retrieval_query"] = retrieval_q
+
+        # 5. retrieval
+        contexts = self.retriever.retrieve(retrieval_q, request_id)
         debug["sources"] = [
             {
                 "id": c["id"],
@@ -132,20 +142,27 @@ class RAGEngine:
         if not contexts:
             return done(REFUSAL_OFFTOPIC, summ, "no_context")
 
-        # 5. prompt assembly + LLM chain
+        # 6. prompt assembly + LLM chain
         # Each block carries title + text + links so the model can name the
-        # topic and reuse the URLs; tags/ids stay out of the prompt.
-        messages = build_messages([context_block(c) for c in contexts], summ, q)
+        # topic and reuse the URLs; tags/ids stay out of the prompt. The last
+        # few turns go in as a labelled data block, never as real chat turns.
+        messages = build_messages(
+            [context_block(c) for c in contexts],
+            summ,
+            q,
+            recent_messages=msgs,
+            recent_turns=settings.recent_turns_in_prompt,
+        )
         raw_answer, tier = self.llm.invoke_chat(messages, request_id)
         if not raw_answer:
             return done(STATIC_FALLBACK, summ, "llm_failed", tier)
 
-        # 6. output guardrails
+        # 7. output guardrails
         answer = sanitize_answer(raw_answer)
         if not answer:
             return done(STATIC_FALLBACK, summ, "empty_answer", tier)
 
-        # 7. conditional summarisation
+        # 8. conditional summarisation
         new_summary = summ
         if settings.enable_summary and len(msgs) >= settings.summary_trigger_after:
             new_summary = summarize_conversation(summ, msgs, self.llm, request_id)

@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     # SCOPE block, not to a number here. Re-run `make calibrate` after editing
     # data/*.json; only raise this if the two groups actually separate.
     min_retrieval_score: float = 0.0
+    # Maximal marginal relevance over the over-fetched candidates. The FAQ
+    # file deliberately mirrors self/experience entries (faq-gate vs self-gate,
+    # faq-location vs self-location-contact), so plain top-k spends two or
+    # three of its five slots on the same fact. MMR picks each next result by
+    #   mmr_lambda * relevance - (1 - mmr_lambda) * max_similarity_to_picked
+    # so a near-duplicate is skipped in favour of something new. 1.0 disables
+    # it (pure relevance order); 0.7 is a conventional starting point.
+    mmr_lambda: float = 0.7
 
     # ---- Groq LLM tiers --------------------------------------------------
     groq_api_key: str
@@ -71,6 +79,10 @@ class Settings(BaseSettings):
 
     # ---- Memory ----------------------------------------------------------
     enable_summary: bool = True
+    # How many of the most recent turns ride in the user prompt as a labelled
+    # RECENT EXCHANGE block. This is short-term memory so "how did he do it"
+    # has a referent; the summary remains the long-term memory. 0 disables.
+    recent_turns_in_prompt: int = 4
     summary_trigger_after: int = 10   # summarise once the client window reaches this many turns
     summary_max_lines: int = 5
     max_recent_messages: int = 12     # window size clients keep between requests

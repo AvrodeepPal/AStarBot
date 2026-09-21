@@ -4,7 +4,7 @@
     "description": "Literal questions visitors ask, with short direct answers.",
     "owner": "Avrodeep Pal",
     "last_updated": "2026-09-21",
-    "version": 1
+    "version": 2
   },
   "entries": [
     {
@@ -63,7 +63,7 @@
       "id": "faq-specialisation",
       "title": "What does Avrodeep specialise in?",
       "question": "What areas does Avrodeep specialise in?",
-      "text": "Professionally: LLM infrastructure — RAG pipelines, vector search, model serving, agent workflows, and the security hardening that keeps production AI systems standing. In research: reasoning in language models, specifically the trade-off between training-time and inference-time compute. Cybersecurity runs through both.",
+      "text": "Professionally: LLM infrastructure — RAG pipelines, vector search, model serving, agent workflows, and the security hardening that keeps production AI systems standing. In research: reasoning models and reinforcement learning — how language models learn to reason, and whether it pays more to train longer or to think longer at answer time. Cybersecurity runs through both.",
       "links": [],
       "tags": ["specialisation","expertise","areas","focus","what does he do","ai","llm","rag","security","faq"],
       "aliases": ["what does he specialise in","his expertise","what is he best at"],
@@ -73,10 +73,10 @@
       "id": "faq-gate",
       "title": "Is Avrodeep preparing for GATE?",
       "question": "Is Avrodeep preparing for GATE or higher studies?",
-      "text": "Yes — GATE 2028 is his main target. He sat it in 2024 and 2025 as practice and skipped 2026 for industry experience. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models.",
+      "text": "Yes — GATE 2028 is his main target. He qualified GATE in 2024 and 2025 as practice runs, then moved his serious attempt to 2028 to get industry experience first. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models.",
       "links": [],
       "tags": ["gate","gate 2028","higher studies","masters","ms research","research assistant","exam","academia","faq"],
-      "aliases": ["is he preparing for gate","gate plans","higher studies plans"],
+      "aliases": ["is he preparing for gate","gate plans","higher studies plans","is he gate qualified","did he clear gate"],
       "priority": 5,
       "last_verified": "2026-09-21"
     },

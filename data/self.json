@@ -4,22 +4,22 @@
     "description": "Identity, education, location, current status and career decisions.",
     "owner": "Avrodeep Pal",
     "last_updated": "2026-09-21",
-    "version": 3
+    "version": 4
   },
   "entries": [
     {
       "id": "self-intro",
       "title": "Introduction",
-      "text": "I'm Avrodeep Pal, an AI Systems Engineer based in Barrackpore, near Kolkata. I work as an SDE at GenAIus Technology on backend infrastructure for an AI platform: RAG pipelines, agent workflows, model serving and security hardening. MCA from Jadavpur University, B.Sc. Computer Science from Barrackpore Rastraguru Surendranath College where I ranked 1st across WBSU. My interest sits where backend engineering meets applied ML, with cybersecurity running through both.",
+      "text": "I'm Avrodeep — a backend engineer who ended up deep in AI, based in Barrackpore near Kolkata. By day I'm an SDE at GenAIus Technology, building the infrastructure behind an AI platform: RAG pipelines, agent workflows, model serving, and the security work that keeps it standing. By night I'm usually reading about reasoning models, or watching anime. On paper: MCA from Jadavpur University, B.Sc. Computer Science from Barrackpore Rastraguru Surendranath College, where I ranked 1st across WBSU. The one-line version: backend engineering meets applied ML, with cybersecurity running through both.",
       "links": ["https://avrodeeppal-portfolio.vercel.app", "https://github.com/AvrodeepPal", "https://linkedin.com/in/AvrodeepPal"],
       "tags": ["introduction","intro","about","about me","who is avrodeep","bio","summary","overview","hello","hi","background","ai systems engineer","role","title"],
-      "aliases": ["who is avrodeep","introduce yourself","tell me about yourself","what does he do"],
+      "aliases": ["who is avrodeep","introduce yourself","tell me about yourself","what does he do","introduce avrodeep","tell me about him","who is he"],
       "priority": 5
     },
     {
       "id": "self-now",
       "title": "What I'm doing now",
-      "text": "As of September 2026: working at GenAIus on backend infrastructure and multimodal model integration, running an independent research project on reasoning models, and preparing for GATE 2028 as my main target. I'm not open to other work opportunities right now and I don't do freelance. My focus is my current role and the research path.",
+      "text": "As of September 2026 my main thing is my job at GenAIus: backend infrastructure and multimodal model integration. On the side, an independent research project on reasoning models, and GATE 2028 preparation in the background. I'm not open to other work opportunities right now and I don't do freelance.",
       "links": ["https://github.com/AvrodeepPal"],
       "tags": ["now","current","currently","what are you working on","status","latest","2026","gate 2028","availability","focus"],
       "aliases": ["what is he doing now","current status","what's he up to","is he available"],
@@ -39,20 +39,20 @@
     {
       "id": "self-gate",
       "title": "GATE and higher studies",
-      "text": "GATE 2028 is my main target. I sat it in 2024 and 2025 as practice without serious preparation and skipped 2026 to gain industry experience, which was the right call. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models, rather than a standard M.Tech. The research route matters more to me than the degree name.",
+      "text": "I qualified GATE in both 2024 and 2025 — just past the cutoff, as practice runs with little preparation, to get familiar with the exam before a serious attempt. I then shifted that serious attempt from 2026 to 2028 so I could get industry experience first, which was the right call. GATE 2028 is the target now. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models, rather than a standard M.Tech. The research route matters more to me than the degree name.",
       "links": [],
       "tags": ["gate","gate 2028","higher studies","masters","ms research","phd","research assistant","exam","preparation","iisc","iit","future plans"],
-      "aliases": ["is he preparing for gate","gate plans","does he want to do a phd","higher studies"],
+      "aliases": ["is he preparing for gate","gate plans","does he want to do a phd","higher studies","is he gate qualified","did he clear gate","his gate score","gate result"],
       "priority": 5,
       "last_verified": "2026-09-21"
     },
     {
       "id": "self-research-aspirations",
       "title": "Where I want to go",
-      "text": "My research interest is reasoning in language models, specifically the trade-off between training-time and inference-time compute. I'm also drawn to bringing verifiable-reward RL into security, where I have production experience and where you can actually check whether a model's reasoning was right, because you know which line was vulnerable. Most reasoning research has a ground-truth problem; security doesn't.",
+      "text": "Reasoning models and reinforcement learning. I'm curious how language models learn to reason, and whether RL actually teaches them something new or just sharpens what they already knew — put simply, for a fixed budget, is it better to train longer or let the model think longer at answer time? I'd also like to point that at security, where I have production experience and where you can actually check whether a model's reasoning was right, because you know which line was vulnerable. Most reasoning research has a ground-truth problem; security doesn't.",
       "links": [],
       "tags": ["research interests","aspirations","goals","reasoning","rl","test time compute","interpretability","llm security","future","ambition","direction"],
-      "aliases": ["what does he want to research","his research interests","where does he want to go"],
+      "aliases": ["what does he want to research","his research interests","where does he want to go","research interests","what research is he interested in"],
       "priority": 4
     },
     {
@@ -112,7 +112,7 @@
     {
       "id": "self-career-decisions",
       "title": "Choices I've made and why",
-      "text": "I chose MCA over an M.Sc. for employability and engineering-faculty exposure. When two offers landed I took the remote startup role over a larger company's information-security position that needed relocation about 2000 km from home — partly family proximity, partly because a small team means touching the whole stack, which is what happened. GATE 2024 and 2025 were practice; 2026 I skipped deliberately for industry experience.",
+      "text": "I chose MCA over an M.Sc. for employability and engineering-faculty exposure. When two offers landed I took the remote startup role over a larger company's information-security position that needed relocation about 2000 km from home — partly family proximity, partly because a small team means touching the whole stack, which is what happened. GATE 2024 and 2025 I qualified as practice runs; 2026 I skipped deliberately for industry experience.",
       "links": [],
       "tags": ["career","decisions","choices","why","mca vs msc","job offers","remote","relocation","gate","planning","reasoning"],
       "aliases": ["why did he choose","his career decisions","why genaius"],

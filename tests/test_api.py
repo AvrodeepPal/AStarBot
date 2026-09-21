@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from rag import __version__
 from rag.config import settings
 from rag.prompt import PROMPT_VERSION, REFUSAL_JAILBREAK
 from tests.conftest import FakeLLM, FakeRetriever
@@ -29,7 +30,7 @@ def test_version(client):
     assert body["prompt_version"] == PROMPT_VERSION
     assert body["embedding_model"] == settings.embedding_model
     assert body["top_k"] == settings.top_k
-    assert body["version"] == "2.0.0"
+    assert body["version"] == __version__
 
 
 def test_chat_valid(client):

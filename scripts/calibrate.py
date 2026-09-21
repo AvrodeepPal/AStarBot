@@ -45,6 +45,15 @@ ON_TOPIC = [
     "What is he working on right now?",
     "Tell me about his LeetCode practice",
     "What research is he doing?",
+    # Queries real visitors typed that once failed or mis-ranked:
+    "any hobbies",
+    "does he watch anime",
+    "tell me about him",
+    "research interests",
+    "is he gate qualified",
+    "explain his credit risk eda project",
+    "what is he working on now",
+    "what are his weaknesses",
 ]
 
 # Questions the bot SHOULD refuse; ideally none of these clear the threshold.
@@ -56,7 +65,17 @@ OFF_TOPIC = [
     "Can you help me debug my React app?",
     "Give me a recipe for biryani",
     "What do you think about cryptocurrency?",
+    "what could be his ctc",
 ]
+
+# Entries that must NOT surface for these questions. The growth-area entry
+# once leaked into "what is he working on now" because its title collided
+# with the question; this is the canary for that class of regression.
+UNWANTED = {
+    "What is he working on right now?": {"pers-communication-growth"},
+    "what is he working on now": {"pers-communication-growth"},
+    "Where does he work?": {"pers-hobbies"},
+}
 
 
 def main() -> None:
@@ -70,14 +89,20 @@ def main() -> None:
         batch_size=32,
     )
 
+    leaks: list[tuple[str, str]] = []
+
     def top_scores(questions: list[str]) -> list[tuple[float, str, str]]:
         """For each question: (best score, question, top-3 entry ids)."""
         out = []
         for q in questions:
             qv = embedder.encode(settings.query_prefix + q, normalize_embeddings=True, convert_to_numpy=True)
             sims = doc_vecs @ qv
-            order = np.argsort(-sims)[:3]
-            ids = ", ".join(records[i]["id"] for i in order)
+            order = np.argsort(-sims)[: settings.top_k]
+            top_ids = [records[i]["id"] for i in order]
+            for bad in UNWANTED.get(q, ()):
+                if bad in top_ids:
+                    leaks.append((q, bad))
+            ids = ", ".join(top_ids[:3])
             out.append((float(sims[order[0]]), q, ids))
         return out
 
@@ -92,6 +117,13 @@ def main() -> None:
     print("\nOFF-TOPIC (best first) — a threshold can only help if these stay BELOW it")
     for s, q, rid in off:
         print(f"  {s:.3f}  {q[:48]:<50} -> {rid}")
+
+    if leaks:
+        print("\nUNWANTED entries inside top-k (fix titles/aliases in data/):")
+        for q, bad in leaks:
+            print(f"  {q!r} -> {bad}")
+    else:
+        print("\nNo unwanted entries in top-k for the canary questions.")
 
     worst_on, best_off = on[0][0], off[0][0]
     print(f"\nworst on-topic : {worst_on:.3f}")

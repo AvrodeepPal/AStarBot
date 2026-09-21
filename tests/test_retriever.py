@@ -6,8 +6,11 @@ from rag import retriever as retriever_mod
 from rag.config import settings
 
 
-def _match(mid, score, **meta):
-    return {"id": mid, "score": score, "metadata": meta}
+def _match(mid, score, values=None, **meta):
+    m = {"id": mid, "score": score, "metadata": meta}
+    if values is not None:
+        m["values"] = values
+    return m
 
 
 def _make_retriever(matches, monkeypatch):
@@ -99,3 +102,43 @@ def test_empty_and_error_paths(monkeypatch):
     assert r.retrieve("q") == []
     index.query.side_effect = RuntimeError("pinecone down")
     assert r.retrieve("q") == []
+
+
+def test_mmr_skips_a_near_duplicate(monkeypatch):
+    """faq-gate and self-gate say the same thing; only one should take a slot."""
+    monkeypatch.setattr(settings, "top_k", 2)
+    monkeypatch.setattr(settings, "mmr_lambda", 0.7)
+    gate = [1.0, 0.0, 0.0]
+    gate_copy = [0.99, 0.14, 0.0]  # cosine ~0.99 with `gate`
+    other = [0.0, 1.0, 0.0]
+    matches = [
+        _match("self-gate", 0.80, values=gate, text="G", priority=3),
+        _match("faq-gate", 0.79, values=gate_copy, text="G2", priority=3),
+        _match("self-now", 0.70, values=other, text="N", priority=3),
+    ]
+    r, _, index = _make_retriever(matches, monkeypatch)
+    assert [m["id"] for m in r.retrieve("q")] == ["self-gate", "self-now"]
+    assert index.query.call_args.kwargs["include_values"] is True
+    # the raw vector never leaks into the result dicts
+    assert all("_values" not in m for m in r.retrieve("q"))
+
+
+def test_mmr_disabled_at_lambda_one(monkeypatch):
+    monkeypatch.setattr(settings, "top_k", 2)
+    monkeypatch.setattr(settings, "mmr_lambda", 1.0)
+    matches = [
+        _match("a", 0.80, values=[1, 0], text="A"),
+        _match("a2", 0.79, values=[1, 0], text="A2"),
+        _match("b", 0.70, values=[0, 1], text="B"),
+    ]
+    r, _, index = _make_retriever(matches, monkeypatch)
+    assert [m["id"] for m in r.retrieve("q")] == ["a", "a2"]
+    assert index.query.call_args.kwargs["include_values"] is False
+
+
+def test_mmr_degrades_to_top_k_without_vectors(monkeypatch):
+    monkeypatch.setattr(settings, "top_k", 2)
+    monkeypatch.setattr(settings, "mmr_lambda", 0.7)
+    matches = [_match("a", 0.80, text="A"), _match("a2", 0.79, text="A2"), _match("b", 0.70, text="B")]
+    r, _, _ = _make_retriever(matches, monkeypatch)
+    assert [m["id"] for m in r.retrieve("q")] == ["a", "a2"]

@@ -61,6 +61,8 @@ Limits (422 if exceeded): question ≤ 500 chars, ≤ 20 messages of ≤ 2000 ch
 
 The server summarises when it receives ≥ `SUMMARY_TRIGGER_AFTER` (10) turns. `interfaces/session.py` is the reference implementation; mirror it in the React hook.
 
+Below that threshold the model still sees the last `RECENT_TURNS_IN_PROMPT` (4) turns, rendered as `ROLE: text` lines inside the user turn (never as real assistant messages, so a forged history carries no authority). Follow-ups that lean on a referent ("how did he do **it**", "and the results?") also get the previous user question prepended to the *retrieval* query only (`rag/followup.py`), so the vector search carries the topic while the model answers the question as typed.
+
 ---
 
 ## Knowledge base
@@ -88,19 +90,22 @@ Pinecone index: `astarbot` · 768-d · cosine · aws us-east-1 · namespace `ast
 
 ## Retrieval
 
-Three stages, because Pinecone only does the first:
+Four stages, because Pinecone only does the first:
 
 1. Query → `QUERY_PREFIX + question` → BGE-base → over-fetch `FETCH_K` (10) candidates.
 2. Drop anything below `MIN_RETRIEVAL_SCORE` on the **raw** cosine score.
-3. Re-rank by `cosine + PRIORITY_WEIGHT × priority` (0.02 × 2..5 = up to 0.06 — reorders near-ties, never overturns a clear winner) and keep `TOP_K` (5).
+3. Re-rank by `cosine + PRIORITY_WEIGHT × priority` (0.02 × 2..5 = up to 0.06 — reorders near-ties, never overturns a clear winner).
+4. MMR down to `TOP_K` (5) with `MMR_LAMBDA` (0.7): each next pick is `λ·relevance − (1−λ)·max-cosine-to-already-picked`, so `faq-gate` doesn't take a slot when `self-gate` is already in. `MMR_LAMBDA=1.0` turns it off.
 
-**`MIN_RETRIEVAL_SCORE` defaults to 0.0, and that's measured, not lazy.** `make calibrate` runs 24 real questions and 7 off-topic ones against the current data with no network: worst on-topic 0.498, best off-topic 0.614 ("recipe for biryani" is genuinely close to `pers-food`). The distributions overlap, so no threshold separates them and refusal belongs to the prompt's SCOPE block. Re-run after editing the knowledge base; raise the threshold only if the groups actually separate.
+**`MIN_RETRIEVAL_SCORE` defaults to 0.0, and that's measured, not lazy.** `make calibrate` runs 32 real questions and 8 off-topic ones against the current data with no network: worst on-topic 0.498, best off-topic 0.617 ("recipe for biryani" is genuinely close to `pers-food`). The distributions overlap, so no threshold separates them and refusal belongs to the prompt's SCOPE block. It also checks a few canary questions for entries that must *not* surface (the growth-area entry once leaked into "what is he working on now" because its title collided). Re-run after editing the knowledge base; raise the threshold only if the groups actually separate.
 
 ## Prompt (`rag/prompt.py`, `PROMPT_VERSION`)
 
-Seven fixed-order blocks: identity → scope → grounding → injection defense → refusal taxonomy → style/length → summary + context + question. Blocks 1–6 ride in the system turn; block 7 (all untrusted material) in the user turn. Bump `PROMPT_VERSION` on any wording change; it is logged per request and exposed at `/version`.
+Eight fixed-order blocks: identity → scope → grounding → domain discipline → injection defense → refusal taxonomy → style/length → summary + recent exchange + context + question. Blocks 1–7 ride in the system turn; block 8 (all untrusted material) in the user turn. Bump `PROMPT_VERSION` on any wording change; it is logged per request and exposed at `/version`.
 
-Refusal strings are constants (`REFUSAL_PRIVATE`, `REFUSAL_OFFTOPIC`, `REFUSAL_UNSAFE`, `REFUSAL_JAILBREAK`, `STATIC_FALLBACK`) so responses are consistent whether the guardrail or the model produces them.
+Domain discipline keeps the four threads (job, research, GATE, personal) apart — a question about his work doesn't get his GATE plans appended, and the weakness entry is used only when weaknesses are asked about. Style matches depth to the verb ("what is X" → a line; "explain X" → the numbers the entry actually holds, up to 120 words) and forbids grading his skills ("highly proficient") — the model describes what he built and lets the visitor judge.
+
+Refusal strings are constants (`REFUSAL_OFFTOPIC`, `REFUSAL_UNSAFE`, `REFUSAL_JAILBREAK`, `STATIC_FALLBACK`) so responses are consistent whether the guardrail or the model produces them. Private/compensation refusals come in three variants (`REFUSAL_PRIVATE_VARIANTS`), each ending in the same `CONTACT_POINTER` to the portfolio's Contact Me section; the model picks the opener that fits the tone and avoids the one it used last.
 
 ## LLM tiers (Groq)
 
@@ -128,9 +133,10 @@ One JSON object per line (`rag/log.py`). `chat_done` records carry `request_id`,
 │   ├── config.py              typed Settings from env
 │   ├── log.py                 JSON logging
 │   ├── guardrails.py          input/output sanitisation, injection regex
-│   ├── prompt.py              7-block versioned prompt, refusal constants
+│   ├── prompt.py              8-block versioned prompt, refusal constants
 │   ├── knowledge.py           entry schema → embedding text / metadata / context block
-│   ├── retriever.py           local BGE + Pinecone
+│   ├── followup.py            follow-up → standalone retrieval query
+│   ├── retriever.py           local BGE + Pinecone + MMR
 │   ├── llm.py                 guard / primary / fallback / summarizer chain
 │   ├── memory.py              summarisation
 │   └── engine.py              orchestrator
@@ -141,7 +147,7 @@ One JSON object per line (`rag/log.py`). `chat_done` records carry `request_id`,
 │   └── session.py             shared client window policy
 ├── scripts/embed.py           index rebuild (--dry-run)
 ├── scripts/calibrate.py       score-distribution check for MIN_RETRIEVAL_SCORE
-├── data/self_data.json        knowledge base
+├── data/*.json                knowledge base (self, experience, projects, studies, personality, faq)
 ├── tests/                     offline unit + API tests
 ├── Dockerfile · .dockerignore · Makefile · pyproject.toml · .env.example
 ```

@@ -1,6 +1,7 @@
 from rag.config import settings
 from rag.prompt import (
     CONTEXT_HEADER,
+    RECENT_EXCHANGE_HEADER,
     REFUSAL_JAILBREAK,
     REFUSAL_OFFTOPIC,
     REFUSAL_UNSAFE,
@@ -83,3 +84,35 @@ def test_unhandled_exception_never_propagates(fake_engine):
     fake_engine.retriever.retrieve = boom
     out = fake_engine.chat("q", [], "keep")
     assert out == {"answer": STATIC_FALLBACK, "updated_summary": "keep"}
+
+
+def test_recent_turns_reach_the_model_as_data(fake_engine):
+    turns = [
+        {"role": "user", "content": "explain his credit risk eda project"},
+        {"role": "assistant", "content": "He ranked features with ANOVA F-tests."},
+    ]
+    fake_engine.chat("what score did he get on that?", turns, None)
+    system, user = (c for _, c in fake_engine._fake_llm.chat_calls[0])
+    assert RECENT_EXCHANGE_HEADER in user and RECENT_EXCHANGE_HEADER not in system
+    assert "USER: explain his credit risk eda project" in user
+    assert "ASSISTANT: He ranked features with ANOVA F-tests." in user
+
+
+def test_follow_up_is_rewritten_for_retrieval_only(fake_engine):
+    turns = [{"role": "user", "content": "explain his credit risk eda project"}]
+    out = fake_engine.chat("how did he do it, what data and algos were used", turns, None, include_debug=True)
+    # retrieval saw the previous topic prepended...
+    assert fake_engine._fake_retriever.last_query == (
+        "explain his credit risk eda project how did he do it, what data and algos were used"
+    )
+    assert out["debug"]["retrieval_query"].startswith("explain his credit risk eda project")
+    # ...but the model was asked the question as typed
+    user_turn = fake_engine._fake_llm.chat_calls[0][1][1]
+    assert user_turn.rstrip().endswith("how did he do it, what data and algos were used")
+
+
+def test_standalone_question_is_not_rewritten(fake_engine):
+    turns = [{"role": "user", "content": "Introduce Avrodeep"}]
+    out = fake_engine.chat("any hobbies", turns, None, include_debug=True)
+    assert fake_engine._fake_retriever.last_query == "any hobbies"
+    assert "retrieval_query" not in out["debug"]

@@ -138,7 +138,12 @@ def run_embedding(dry_run: bool = False) -> int:
     try:
         index.delete(delete_all=True, namespace=settings.pinecone_namespace)
     except Exception as exc:  # noqa: BLE001 - an empty namespace raises on some SDKs
-        log.warning("namespace_clear_failed", extra={"err": str(exc)[:200]})
+        err = str(exc)
+        if "404" in err or "not found" in err.lower():
+            # Nothing to clear on a fresh index: expected, not a warning.
+            log.info("namespace_empty", extra={"namespace": settings.pinecone_namespace})
+        else:
+            log.warning("namespace_clear_failed", extra={"err": err[:200]})
 
     print("Upserting…")
     for i in tqdm(range(0, len(payload), BATCH_SIZE), unit="batch"):

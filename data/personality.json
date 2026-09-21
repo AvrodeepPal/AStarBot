@@ -4,7 +4,7 @@
     "description": "Values, strengths, opinions, tastes and the parts that don't fit under skills or experience.",
     "owner": "Avrodeep Pal",
     "last_updated": "2026-09-21",
-    "version": 1
+    "version": 2
   },
   "entries": [
     {
@@ -27,11 +27,11 @@
     },
     {
       "id": "pers-communication-growth",
-      "title": "What I'm working on",
+      "title": "Communication — something I'm deliberately improving",
       "text": "Communication in professional settings. I joke and use sarcasm constantly, and I've always had friend circles who read the intent behind my words correctly. I can't expect that from people who don't know me, especially in new professional contexts. So I'm working on respecting other people's boundaries with humour, reading situations from their point of view, and being a more deliberate communicator when the room isn't full of people who know me.",
       "links": [],
       "tags": ["weakness","working on","self awareness","communication","humour","sarcasm","boundaries","professional","growth","improvement"],
-      "aliases": ["his weaknesses","what is he working on","what does he struggle with","areas for improvement"],
+      "aliases": ["his weaknesses","what is his weakness","what does he struggle with","areas for improvement","what is he trying to improve"],
       "priority": 4
     },
     {
@@ -80,12 +80,21 @@
       "priority": 4
     },
     {
+      "id": "pers-hobbies",
+      "title": "Hobbies and how I rest",
+      "text": "When I'm not working or reading into research, I rest: anime, movies and manga; music on shuffle, mostly anime soundtracks; evening walks or sitting on the terrace under the sky; good food, whether that's Dada-Boudi biriyani or a new cafe; weekends out with friends; and long conversations that go somewhere. None of it is meant to be productive — that's the point.",
+      "links": [],
+      "tags": ["hobbies","interests","free time","outside work","fun","relax","rest","leisure","for fun","anime","music","walks","food","travel","conversations"],
+      "aliases": ["any hobbies","his hobbies","what are his hobbies","does he have hobbies","what does he do for fun","what does he do in his free time","how does he relax","what does he do to rest","what is he into outside work"],
+      "priority": 4
+    },
+    {
       "id": "pers-music",
       "title": "Music",
       "text": "Currently 'I Really Want to Stay at Your House' by Rosa Walton, from Cyberpunk: Edgerunners. Mostly anime openings, endings and OSTs, with small sprinkles of English, Hindi and Bengali songs. Playlist on shuffle for the commute to and from office — it keeps the head light.",
       "links": [],
       "tags": ["music","anime","ost","soundtrack","rosa walton","edgerunners","cyberpunk","openings","commute","what do you listen to","hobbies"],
-      "aliases": ["what music does he listen to","his favourite song","music taste"],
+      "aliases": ["what music does he listen to","his favourite song","music taste","his hobbies","what does he do for fun"],
       "priority": 2
     },
     {
@@ -94,7 +103,7 @@
       "text": "Being from Barrackpore, the default craving is Dada-Boudi biriyani. Mobina Restaurant for the more special occasions. Beyond that I like trying variety from wherever — cafes, street stalls, lunch or dinner or snacks. Building up digestive capacity while I still have the age for it.",
       "links": [],
       "tags": ["food","biriyani","dada boudi","mobina","barrackpore","kolkata food","restaurants","street food","cafes","hobbies","favourite food"],
-      "aliases": ["what food does he like","favourite restaurant","food recommendations"],
+      "aliases": ["what food does he like","favourite restaurant","food recommendations","his hobbies","what does he do for fun"],
       "priority": 2
     },
     {
@@ -103,16 +112,16 @@
       "text": "I can't stay in a room for long — evening walks or just sitting on the terrace under the sky on casual days. Office trips and weekends out with friends are routine now. On longer trips I've covered the South Indian states; Kerala's backwaters and Ramoji Film City in Hyderabad are the two I'd go back to without a second thought. Next I want to head north, for the mountains and hills.",
       "links": [],
       "tags": ["travel","trips","places","kerala","backwaters","hyderabad","ramoji film city","south india","mountains","north india","walks","hobbies","wishlist"],
-      "aliases": ["where has he travelled","travel plans","places he's visited"],
+      "aliases": ["where has he travelled","travel plans","places he's visited","his hobbies","what does he do for fun","does he go on walks"],
       "priority": 2
     },
     {
       "id": "pers-comfort-media",
       "title": "Anime, manga and a book I want to write",
-      "text": "I keep up with the latest anime, movies and manga — it's where I go to reset. On that note, I've wanted to write an anime light novel for a while and have drafted it a few times without finishing. That's probably a project for my fifties, after retirement, when there's time to do it properly.",
+      "text": "I keep up with the latest anime, movies and manga — it's where I go to rest. On that note, I've wanted to write an anime light novel for a while and have drafted it a few times without finishing. That's probably a project for my fifties, after retirement, when there's time to do it properly.",
       "links": [],
       "tags": ["anime","manga","movies","comfort media","relax","recharge","light novel","writing","hobbies","ambitions","fun facts"],
-      "aliases": ["what does he watch","does he like anime","what does he do to relax","comfort shows"],
+      "aliases": ["what does he watch","does he like anime","what does he do to relax","comfort shows","his hobbies","what does he do for fun","what does he do to rest"],
       "priority": 3
     },
     {
