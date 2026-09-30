@@ -7,6 +7,10 @@ os.environ.setdefault("PINECONE_API_KEY", "test-pinecone-key")
 os.environ.setdefault("GROQ_API_KEY", "test-groq-key")
 os.environ.setdefault("ENABLE_PROMPT_GUARD_LLM", "false")
 os.environ.setdefault("LOG_LEVEL", "WARNING")
+# Tests never reach a real embedder; pin the backend so a developer's HF_TOKEN
+# in .env can't change which class build_embedder() returns.
+os.environ.setdefault("EMBEDDING_BACKEND", "local")
+os.environ.setdefault("HF_TOKEN", "")
 
 import pytest  # noqa: E402
 
@@ -45,6 +49,10 @@ class FakeRetriever:
         self.last_query = query
         return list(self.results)
 
+    async def aretrieve(self, query, request_id="-"):
+        # Looked up at call time so tests can monkeypatch `retrieve`.
+        return self.retrieve(query, request_id)
+
 
 class FakeLLM:
     """Scripted LLM chain. `answers` is consumed in order by invoke_chat."""
@@ -68,6 +76,25 @@ class FakeLLM:
     def invoke_summarize(self, messages, request_id="-"):
         self.summary_calls.append(messages)
         return self.summary
+
+    # Async surface used by the engine; delegates to the scripted sync methods.
+
+    async def acheck_safe(self, text, request_id="-"):
+        return self.check_safe(text, request_id)
+
+    async def ainvoke_chat(self, messages, request_id="-"):
+        return self.invoke_chat(messages, request_id)
+
+    async def ainvoke_summarize(self, messages, request_id="-"):
+        return self.invoke_summarize(messages, request_id)
+
+    async def astream_chat(self, messages, request_id="-"):
+        """Stream the next scripted answer a few characters at a time."""
+        answer, tier = self.invoke_chat(messages, request_id)
+        if answer is None:
+            return
+        for i in range(0, len(answer), 7):
+            yield tier, answer[i : i + 7]
 
 
 @pytest.fixture

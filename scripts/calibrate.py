@@ -15,8 +15,8 @@ knowledge base is worse than no threshold at all.
 import numpy as np
 
 from rag.config import settings
+from rag.embedder import load_embedder
 from rag.knowledge import embedding_text
-from rag.retriever import load_embedder
 from scripts.embed import load_records
 
 # Questions a real visitor would ask; every one SHOULD retrieve something.

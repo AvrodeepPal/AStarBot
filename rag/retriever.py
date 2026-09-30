@@ -1,24 +1,33 @@
-"""Local BGE embeddings + Pinecone top-k retrieval.
+"""Query embedding + Pinecone top-k retrieval, with an in-process LRU cache.
 
-The embedding model (BAAI/bge-base-en-v1.5, 768-d) runs in-process via
-sentence-transformers: no per-query API cost, no network hop, one ~440 MB
-download cached under HF_HOME.
+The query encoder is BAAI/bge-base-en-v1.5 (768-d), run either in-process or
+via the Hugging Face Inference API (`rag.embedder`); the retriever does not
+care which. BGE is asymmetric: queries carry `settings.query_prefix`,
+documents do not, and the prefix lives in exactly one place (`rag.embedder`).
 
-BGE is asymmetric. Queries are embedded WITH `settings.query_prefix`;
-documents (scripts/embed.py) are embedded WITHOUT it. Mixing these up
-noticeably degrades recall, so the prefix lives in exactly one place here.
+Two entry points share one pipeline:
+    aretrieve   async; used by the engine. Raises RetrievalError when the
+                embedder or Pinecone fails, so the engine can answer
+                "technical snag" instead of "off-topic".
+    retrieve    sync convenience wrapper; errors are logged and yield [].
 """
 
+import asyncio
 import logging
+import threading
+from collections import OrderedDict
 
-import numpy as np
 from pinecone import Pinecone
-from sentence_transformers import SentenceTransformer
 
 from rag.config import settings
+from rag.embedder import EmbedderError, build_embedder
 from rag.knowledge import DEFAULT_PRIORITY
 
 log = logging.getLogger("astarbot.retriever")
+
+
+class RetrievalError(RuntimeError):
+    """The embedder or Pinecone failed; distinct from "nothing relevant found"."""
 
 
 def _field(obj, key, default=None):
@@ -28,42 +37,135 @@ def _field(obj, key, default=None):
     return getattr(obj, key, default)
 
 
-def load_embedder() -> SentenceTransformer:
-    """Shared by the retriever and the embed script so both use one model."""
-    log.info(
-        "loading_embedding_model",
-        extra={"model": settings.embedding_model, "device": settings.embedding_device},
-    )
-    model = SentenceTransformer(settings.embedding_model, device=settings.embedding_device)
-    # Renamed upstream; keep the old name as a fallback for older installs.
-    get_dim = getattr(model, "get_embedding_dimension", None) or model.get_sentence_embedding_dimension
-    dim = get_dim()
-    if dim != settings.embedding_dim:
-        raise RuntimeError(
-            f"Embedding model produces {dim}-d vectors but EMBEDDING_DIM={settings.embedding_dim}; "
-            "the Pinecone index dimension must match the model."
-        )
-    return model
+def cache_key(query: str) -> str:
+    """Case- and whitespace-insensitive key.
+
+    BGE-base-en-v1.5 uses an uncased tokenizer that also collapses whitespace,
+    so these variants embed identically; folding them raises the hit rate at
+    no cost to accuracy.
+    """
+    return " ".join(query.lower().split())
+
+
+class RetrievalCache:
+    """Small thread-safe LRU of finished retrievals.
+
+    Values are stored as tuples of dicts and copied on the way out, so a
+    caller mutating its results can never poison a later hit. Only non-empty
+    results are stored: an empty list may be a transient failure.
+    """
+
+    def __init__(self, maxsize: int) -> None:
+        self.maxsize = maxsize
+        self._data: OrderedDict[str, tuple[dict, ...]] = OrderedDict()
+        self._lock = threading.Lock()
+        self.hits = 0
+        self.misses = 0
+
+    def get(self, key: str) -> list[dict] | None:
+        with self._lock:
+            value = self._data.get(key)
+            if value is None:
+                self.misses += 1
+                return None
+            self._data.move_to_end(key)
+            self.hits += 1
+        return [dict(r) for r in value]
+
+    def put(self, key: str, results: list[dict]) -> None:
+        if not results:
+            return
+        with self._lock:
+            self._data[key] = tuple(dict(r) for r in results)
+            self._data.move_to_end(key)
+            while len(self._data) > self.maxsize:
+                self._data.popitem(last=False)
+
+    def __len__(self) -> int:
+        return len(self._data)
 
 
 class PineconeRetriever:
     def __init__(self) -> None:
-        self.embedder = load_embedder()
+        self.embedder = build_embedder()
         self.pc = Pinecone(api_key=settings.pinecone_api_key)
         self.index = self.pc.Index(settings.pinecone_index_name)
+        size = settings.retrieval_cache_size
+        self.cache: RetrievalCache | None = RetrievalCache(size) if size > 0 else None
 
-    def _embed_query(self, query: str) -> list[float]:
-        vec = self.embedder.encode(
-            settings.query_prefix + query,
-            normalize_embeddings=True,
-            convert_to_numpy=True,
+    def _query_kwargs(self, vec: list[float]) -> dict:
+        return {
+            "vector": vec,
+            "top_k": max(settings.fetch_k, settings.top_k),
+            "include_metadata": True,
+            # Vectors are only needed for MMR; skip the 10 x 768 floats otherwise.
+            "include_values": settings.mmr_lambda < 1.0,
+            "namespace": settings.pinecone_namespace,
+        }
+
+    def _cached(self, query: str, request_id: str) -> list[dict] | None:
+        if self.cache is None:
+            return None
+        results = self.cache.get(cache_key(query))
+        log.info(
+            "retrieval_cache",
+            extra={
+                "request_id": request_id,
+                "hit": results is not None,
+                "size": len(self.cache),
+                "maxsize": self.cache.maxsize,
+                "hits": self.cache.hits,
+                "misses": self.cache.misses,
+            },
         )
-        return vec.tolist()
+        return results
+
+    def _store(self, query: str, results: list[dict]) -> None:
+        if self.cache is not None:
+            self.cache.put(cache_key(query), results)
+
+    async def aretrieve(self, query: str, request_id: str = "-") -> list[dict]:
+        """Return up to top_k matches, best first. See `_postprocess` for the stages.
+
+        Each result carries {id, title, text, links, tags, source, priority,
+        score, final_score}. Raises RetrievalError on embedder/Pinecone
+        failure; [] means Pinecone answered but nothing survived filtering.
+        """
+        cached = self._cached(query, request_id)
+        if cached is not None:
+            return cached
+        try:
+            vec = await self.embedder.aembed_query(query)
+        except EmbedderError as exc:
+            log.error("embed_fail", extra={"request_id": request_id, "err": str(exc)[:200]})
+            raise RetrievalError(str(exc)) from exc
+        try:
+            # The Pinecone client is synchronous; keep it off the event loop.
+            res = await asyncio.to_thread(self.index.query, **self._query_kwargs(vec))
+        except Exception as exc:  # noqa: BLE001
+            log.error("retrieval_fail", extra={"request_id": request_id, "err": str(exc)[:200]})
+            raise RetrievalError(str(exc)) from exc
+        results = self._postprocess(res, request_id)
+        self._store(query, results)
+        return results
 
     def retrieve(self, query: str, request_id: str = "-") -> list[dict]:
-        """Return up to top_k matches, best first.
+        """Synchronous variant for scripts and tests. Failures are logged and yield []."""
+        cached = self._cached(query, request_id)
+        if cached is not None:
+            return cached
+        try:
+            vec = self.embedder.embed_query(query)
+            res = self.index.query(**self._query_kwargs(vec))
+        except Exception as exc:  # noqa: BLE001
+            log.error("retrieval_fail", extra={"request_id": request_id, "err": str(exc)[:200]})
+            return []
+        results = self._postprocess(res, request_id)
+        self._store(query, results)
+        return results
 
-        Four stages, because Pinecone can only do the first one:
+    def _postprocess(self, res, request_id: str) -> list[dict]:
+        """Stages 2-4 of retrieval; Pinecone can only do stage 1:
           1. vector search for `fetch_k` candidates (over-fetch)
           2. drop anything below `min_retrieval_score` on the RAW cosine score,
              which is the quantity the threshold was calibrated against
@@ -71,25 +173,8 @@ class PineconeRetriever:
              editorially important entry wins a near-tie
           4. MMR selection down to `top_k` (`mmr_lambda` < 1.0), so the FAQ
              copy of a fact does not crowd out a different, useful entry
-
-        Each result carries {id, title, text, links, tags, source, priority,
-        score, final_score}. Pinecone errors are logged and yield an empty
-        list; the engine maps that to a refusal rather than raising.
         """
         use_mmr = settings.mmr_lambda < 1.0
-        try:
-            vec = self._embed_query(query)
-            res = self.index.query(
-                vector=vec,
-                top_k=max(settings.fetch_k, settings.top_k),
-                include_metadata=True,
-                include_values=use_mmr,
-                namespace=settings.pinecone_namespace,
-            )
-        except Exception as exc:  # noqa: BLE001
-            log.error("retrieval_fail", extra={"request_id": request_id, "err": str(exc)[:200]})
-            return []
-
         matches = _field(res, "matches", []) or []
         candidates: list[dict] = []
         for m in matches:
@@ -149,6 +234,8 @@ def _mmr_select(candidates: list[dict], k: int, lam: float) -> list[dict]:
     vectors = [c.get("_values") for c in candidates]
     if any(v is None or len(v) == 0 for v in vectors):
         return candidates[:k]
+
+    import numpy as np  # only paid for when MMR is actually on
 
     mat = np.asarray(vectors, dtype="float32")
     norms = np.linalg.norm(mat, axis=1, keepdims=True)

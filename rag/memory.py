@@ -30,6 +30,22 @@ def _clip_lines(text: str, max_lines: int) -> str:
     return "\n".join(lines[:max_lines])
 
 
+def _build_messages(previous_summary: str | None, recent_messages: list[dict]):
+    return [
+        ("system", SUMMARY_PROMPT),
+        ("user", _format_transcript(previous_summary, recent_messages)),
+    ]
+
+
+def _finalise(raw: str | None, previous_summary: str | None) -> str | None:
+    if not raw:
+        return previous_summary
+    summary = _clip_lines(raw, settings.summary_max_lines)
+    if len(summary) > settings.max_summary_chars:
+        summary = summary[: settings.max_summary_chars].rsplit(" ", 1)[0] + "…"
+    return summary or previous_summary
+
+
 def summarize_conversation(
     previous_summary: str | None,
     recent_messages: list[dict],
@@ -39,16 +55,18 @@ def summarize_conversation(
     """Return an updated summary, or the previous one if nothing could be produced."""
     if not recent_messages:
         return previous_summary
+    raw = llm.invoke_summarize(_build_messages(previous_summary, recent_messages), request_id)
+    return _finalise(raw, previous_summary)
 
-    messages = [
-        ("system", SUMMARY_PROMPT),
-        ("user", _format_transcript(previous_summary, recent_messages)),
-    ]
-    raw = llm.invoke_summarize(messages, request_id)
-    if not raw:
+
+async def asummarize_conversation(
+    previous_summary: str | None,
+    recent_messages: list[dict],
+    llm: LLMChain,
+    request_id: str = "-",
+) -> str | None:
+    """Async twin of `summarize_conversation`, used on the request path."""
+    if not recent_messages:
         return previous_summary
-
-    summary = _clip_lines(raw, settings.summary_max_lines)
-    if len(summary) > settings.max_summary_chars:
-        summary = summary[: settings.max_summary_chars].rsplit(" ", 1)[0] + "…"
-    return summary or previous_summary
+    raw = await llm.ainvoke_summarize(_build_messages(previous_summary, recent_messages), request_id)
+    return _finalise(raw, previous_summary)

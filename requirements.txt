@@ -1,5 +1,8 @@
 # Thin shim for platforms that only read requirements.txt (Streamlit Community
-# Cloud, the devcontainer). Dependencies are declared once in pyproject.toml.
-# The extra index makes pip prefer CPU-only torch wheels (no multi-GB CUDA libs).
---extra-index-url https://download.pytorch.org/whl/cpu
--e .
+# Cloud). Dependencies are declared once in pyproject.toml.
+#
+# Since v2.4.0 the core install has no torch / sentence-transformers (they
+# moved to the [local-embed] extra), so this is light enough for Streamlit
+# Cloud's 1 GB tier and the separate requirements-streamlit.txt is gone.
+# The Railway image installs from pyproject.toml directly (see Dockerfile).
+-e .[ui]

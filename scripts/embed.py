@@ -5,7 +5,7 @@
 
 Every file in data/ is read, so adding a file needs no code change. Each entry
 becomes exactly one vector (no chunking), embedded with the same local BGE
-model the retriever uses and WITHOUT the query prefix (BGE is asymmetric:
+model the retriever uses (always locally) and WITHOUT the query prefix (BGE is asymmetric:
 prefix on queries only), normalised for cosine similarity.
 
 What gets vectorised is `knowledge.embedding_text`: title + FAQ question +
@@ -28,9 +28,9 @@ from pinecone import Pinecone
 from tqdm import tqdm
 
 from rag.config import settings
+from rag.embedder import load_embedder
 from rag.knowledge import build_metadata, embedding_text, normalize_entry
 from rag.log import setup_logging
-from rag.retriever import load_embedder
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 BATCH_SIZE = 100

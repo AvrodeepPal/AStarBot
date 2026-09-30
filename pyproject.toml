@@ -4,26 +4,32 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "astarbot"
-version = "2.1.0"
+version = "2.4.0"
 description = "RAG-based portfolio chatbot — grounded, bounded, stateless"
 readme = "README.md"
 requires-python = ">=3.11"
+# Core = what the API needs with EMBEDDING_BACKEND=hf. No torch.
 dependencies = [
     "python-dotenv>=1.0.0",
     "pydantic>=2.6.0",
     "pydantic-settings>=2.2.0",
     "fastapi>=0.110.0",
-    "uvicorn[standard]>=0.29.0",
+    # >=0.30: the Multiprocess supervisor respawns dead workers (main.py relies on it)
+    "uvicorn[standard]>=0.30.0",
     "pinecone>=5.0.0",
-    "sentence-transformers>=2.6.1",
-    "torch>=2.2.0",
     "langchain-core>=0.2.0",
     "langchain-groq>=0.1.5",
+    "requests>=2.31.0",
+    "numpy>=1.26.0",
     "tqdm>=4.66.0",
-    "streamlit>=1.33.0",
 ]
 
 [project.optional-dependencies]
+# Local BGE embeddings: EMBEDDING_BACKEND=local, `make embed`, `make calibrate`.
+# Install with the CPU torch index: see `make dev` / `make install-local`.
+local-embed = ["sentence-transformers>=2.6.1", "torch>=2.2.0"]
+# The Streamlit beta UI (Streamlit Community Cloud installs this via requirements.txt).
+ui = ["streamlit>=1.33.0"]
 dev = ["pytest>=8.0.0", "httpx>=0.27.0", "ruff>=0.4.0"]
 
 [tool.setuptools.packages.find]

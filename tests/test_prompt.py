@@ -6,6 +6,7 @@ from rag.prompt import (
     LEAK_MARKERS,
     MEMORY_HEADER,
     NO_CONTEXT_TEXT,
+    PRIVATE_PREFIXES,
     PROMPT_VERSION,
     QUESTION_HEADER,
     RAG_CONSTRAINTS,
@@ -71,7 +72,9 @@ def test_empty_context_still_valid():
 
 
 def test_refusal_templates_embedded_in_prompt():
-    for r in (*REFUSAL_PRIVATE_VARIANTS, REFUSAL_OFFTOPIC, REFUSAL_UNSAFE, REFUSAL_JAILBREAK):
+    # v2.4.0: private variants are listed as openers + one shared pointer
+    # instead of three full strings; every piece must still be present.
+    for r in (*PRIVATE_PREFIXES, CONTACT_POINTER, REFUSAL_OFFTOPIC, REFUSAL_UNSAFE, REFUSAL_JAILBREAK):
         assert r in REFUSAL_GUIDANCE
     assert REFUSAL_PRIVATE == REFUSAL_PRIVATE_VARIANTS[0]
 

@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 
+from rag import embedder as embedder_mod
 from rag import retriever as retriever_mod
 from rag.config import settings
 
@@ -14,13 +15,16 @@ def _match(mid, score, values=None, **meta):
 
 
 def _make_retriever(matches, monkeypatch):
+    # `embedder` is the SentenceTransformer inside a real LocalBGEEmbedder, so
+    # the query-prefix contract is exercised end to end.
     embedder = MagicMock()
     embedder.encode.return_value = np.zeros(settings.embedding_dim, dtype="float32")
     index = MagicMock()
     index.query.return_value = {"matches": matches}
     pc = MagicMock()
     pc.Index.return_value = index
-    monkeypatch.setattr(retriever_mod, "load_embedder", lambda: embedder)
+    monkeypatch.setattr(embedder_mod, "load_embedder", lambda: embedder)
+    monkeypatch.setattr(settings, "embedding_backend", "local")
     monkeypatch.setattr(retriever_mod, "Pinecone", lambda api_key: pc)
     return retriever_mod.PineconeRetriever(), embedder, index
 

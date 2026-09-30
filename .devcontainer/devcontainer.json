@@ -10,7 +10,7 @@
       "extensions": ["ms-python.python", "ms-python.vscode-pylance", "charliermarsh.ruff"]
     }
   },
-  "updateContentCommand": "pip3 install --user --extra-index-url https://download.pytorch.org/whl/cpu -e '.[dev]' && echo '✅ Packages installed'",
+  "updateContentCommand": "pip3 install --user --extra-index-url https://download.pytorch.org/whl/cpu -e '.[dev,ui,local-embed]' && echo '✅ Packages installed'",
   "postAttachCommand": {
     "server": "streamlit run interfaces/streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false"
   },

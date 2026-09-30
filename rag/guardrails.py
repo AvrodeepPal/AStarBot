@@ -7,6 +7,8 @@ Three cheap, deterministic defences that run without any model call:
     contains_injection   regex screen for common prompt-override phrasing
     sanitize_answer      remove leaked prompt markers / reasoning tags and
                          cap answer length
+    StreamSanitizer      the same output rules, applied incrementally to a
+                         token stream (POST /chat/stream)
 
 The prompt-guard LLM (rag.llm) and the INJECTION_DEFENSE prompt block are the
 second and third layers; this module is the first and always runs.
@@ -68,20 +70,16 @@ def sanitize_text(text: str | None, limit: int) -> str:
     return cleaned
 
 
-def validate_chat_input(
-    question: str,
+def validate_history(
     recent_messages: list[dict] | None,
     summary: str | None,
-) -> tuple[str, list[dict], str | None]:
-    """Return (clean_question, clean_messages, clean_summary).
+) -> tuple[list[dict], str | None]:
+    """Return (clean_messages, clean_summary).
 
-    - question: required, <= max_question_chars
     - recent_messages: last max_messages_sent only; unknown roles and
       empty contents are dropped silently
     - summary: optional, <= max_summary_chars
     """
-    clean_question = sanitize_text(question, settings.max_question_chars)
-
     messages = list(recent_messages or [])
     if len(messages) > settings.max_messages_sent:
         messages = messages[-settings.max_messages_sent:]
@@ -104,6 +102,21 @@ def validate_chat_input(
         except GuardrailError:
             clean_summary = None
 
+    return clean_messages, clean_summary
+
+
+def validate_chat_input(
+    question: str,
+    recent_messages: list[dict] | None,
+    summary: str | None,
+) -> tuple[str, list[dict], str | None]:
+    """Return (clean_question, clean_messages, clean_summary).
+
+    - question: required, <= max_question_chars
+    - recent_messages / summary: see `validate_history`
+    """
+    clean_question = sanitize_text(question, settings.max_question_chars)
+    clean_messages, clean_summary = validate_history(recent_messages, summary)
     return clean_question, clean_messages, clean_summary
 
 
@@ -129,3 +142,78 @@ def sanitize_answer(answer: str, request_id: str | None = None) -> str:
             cleaned = head.rsplit(" ", 1)[0].rstrip() + "…"
         log.info("answer_truncated", extra={"request_id": request_id, "orig_len": orig_len})
     return cleaned
+
+
+# Longest string the stream sanitizer must be able to see whole before it
+# releases text: every leak marker, and the reasoning-tag delimiters.
+_STREAM_HOLDBACK = max(len(m) for m in (*LEAK_MARKERS, "<think>", "</think>"))
+
+
+class StreamSanitizer:
+    """`sanitize_answer` for a token stream.
+
+    Text is released only once it can no longer be part of a leak marker:
+    the last `_STREAM_HOLDBACK` characters are held back until more tokens
+    arrive (or `flush`), so a marker split across chunks is still removed.
+    An unclosed `<think>` holds everything after it. The total is capped at
+    max_answer_chars, cut at a word boundary. Holding back ~40 characters
+    delays the visible stream by a few tokens, nothing more.
+    """
+
+    def __init__(self, request_id: str | None = None) -> None:
+        self.request_id = request_id
+        self.truncated = False
+        self._pending = ""
+        self._parts: list[str] = []
+        self._chars = 0
+
+    @property
+    def text(self) -> str:
+        """Everything released so far — exactly what the client received."""
+        return "".join(self._parts)
+
+    @staticmethod
+    def _clean(text: str) -> str:
+        text = _THINK_TAGS.sub("", text)
+        text = _LEAK_RE.sub("", text)
+        return CONTROL_CHARS.sub("", text)
+
+    def feed(self, chunk: str) -> str:
+        """Add a chunk; return the text that is now safe to send (may be "")."""
+        if self.truncated:
+            return ""
+        self._pending = self._clean(self._pending + chunk)
+        cut = len(self._pending) - _STREAM_HOLDBACK
+        lower = self._pending.lower()
+        open_think = lower.rfind("<think>")
+        if open_think != -1 and "</think>" not in lower[open_think:]:
+            cut = min(cut, open_think)
+        if cut <= 0:
+            return ""
+        out, self._pending = self._pending[:cut], self._pending[cut:]
+        return self._release(out)
+
+    def flush(self) -> str:
+        """Release whatever is still held back at end of stream."""
+        if self.truncated:
+            return ""
+        tail, self._pending = self._clean(self._pending), ""
+        open_think = tail.lower().find("<think>")
+        if open_think != -1:  # never closed: reasoning, not answer
+            tail = tail[:open_think]
+        return self._release(tail.rstrip())
+
+    def _release(self, out: str) -> str:
+        if not self._parts:
+            out = out.lstrip()
+            if not out:
+                return ""
+        room = settings.max_answer_chars - self._chars
+        if len(out) > room:
+            head = out[:room]
+            out = (head.rsplit(" ", 1)[0] if " " in head else head).rstrip() + "…"
+            self.truncated = True
+            log.info("answer_truncated", extra={"request_id": self.request_id, "stream": True})
+        self._chars += len(out)
+        self._parts.append(out)
+        return out
