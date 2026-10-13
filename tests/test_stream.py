@@ -117,7 +117,7 @@ def test_unsafe_guard_wins_even_if_retrieval_failed(fake_engine, monkeypatch):
     fake_engine._fake_llm.safe = False
 
     async def failing(query, request_id="-"):
-        raise RetrievalError("hf rate limited")
+        raise RetrievalError("cf rate limited")
 
     fake_engine.retriever.aretrieve = failing
     assert asyncio.run(fake_engine.achat("q", [], None))["answer"] == REFUSAL_UNSAFE
@@ -128,7 +128,7 @@ def test_retrieval_failure_is_a_snag_not_off_topic(fake_engine, monkeypatch, gua
     monkeypatch.setattr(settings, "enable_prompt_guard_llm", guard)
 
     async def failing(query, request_id="-"):
-        raise RetrievalError("hf rate limited")
+        raise RetrievalError("cf rate limited")
 
     fake_engine.retriever.aretrieve = failing
     out = asyncio.run(fake_engine.achat("q", [], None, include_debug=True))

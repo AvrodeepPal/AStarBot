@@ -4,6 +4,48 @@ All notable changes to AStarBot. Versions follow the app version in `rag/__init_
 
 ---
 
+## [2.4.1] — 2026-10-13 · Cloudflare Workers AI replaces Hugging Face
+
+**Prompt:** `v2.4.0` (unchanged) · **App:** `2.4.0 → 2.4.1`
+
+### Why
+
+Hugging Face's free serverless inference tier is credit-gated. Once the small monthly credit runs out, it returns 401/402 and every query falls back to the "technical snag" answer. Cloudflare Workers AI hosts the same `BAAI/bge-base-en-v1.5` model on a free tier of 10,000 requests/day, with no credit system.
+
+### Added
+
+- `CloudflareEmbedder` in `rag/embedder.py`: `POST {text: [QUERY_PREFIX + query], pooling: "cls"}` to `api.cloudflare.com/client/v4/accounts/<CF_ACCOUNT_ID>/ai/run/@cf/baai/bge-base-en-v1.5`. The response is L2-normalised client-side. 429/5xx and network errors are retried with exponential backoff; other 4xx fail fast. It rejects `success: false`, a wrong dimension, or a pooling mode that doesn't match the request.
+- Settings: `CF_API_TOKEN`, `CF_ACCOUNT_ID`, `CF_EMBEDDING_MODEL`, `CF_POOLING`, `CF_TIMEOUT_SECONDS`, `CF_MAX_RETRIES`; property `settings.cf_embedding_endpoint`.
+
+### Removed
+
+- The Hugging Face backend: `HFEmbedder`, `HF_TOKEN`, `HF_EMBEDDING_URL`, `HF_TIMEOUT_SECONDS`, `HF_MAX_RETRIES` and `settings.hf_embedding_endpoint`. `EMBEDDING_BACKEND=hf` now fails validation at startup. Leftover `HF_*` variables are ignored. (`HF_HOME`, the local model's download cache, is unrelated and stays.)
+
+### Changed
+
+- `EMBEDDING_BACKEND` accepts `auto`, `cf` or `local`. `auto` resolves to `cf` when both `CF_API_TOKEN` and `CF_ACCOUNT_ID` are set, otherwise `local`.
+- `make check-embed` (`scripts/check_embedder.py`) compares Cloudflare with local BGE instead of HF with local.
+- `.env.example`, README and Makefile describe Cloudflare.
+
+### Pooling
+
+Workers AI's BGE models default to **mean** pooling, kept that way for backward compatibility. sentence-transformers' `bge-base-en-v1.5`, which built the Pinecone index, uses **CLS** pooling (`1_Pooling/config.json: pooling_mode_cls_token: true`). Cloudflare documents the two as incompatible. So the request always sends `pooling: "cls"`, and `CF_POOLING` exists only to make that explicit. Without it the parity check would fail and retrieval would degrade without any error.
+
+### Unchanged
+
+The prompt version, retrieval behaviour, Pinecone index, streaming endpoint, async pipeline, LRU cache and worker supervision are all unchanged. The vector space stays the same, so no reindex is needed.
+
+### Deploy order
+
+v2.4.0 rejects `EMBEDDING_BACKEND=cf`, and v2.4.1 rejects `hf`. Use `auto` to bridge the two:
+
+1. Locally: fill `CF_*` in `.env` and run `make check-embed` (cosine ≥ 0.999).
+2. Railway, **before** pushing: add `CF_API_TOKEN` and `CF_ACCOUNT_ID`, and set `EMBEDDING_BACKEND=auto`. v2.4.0 ignores `CF_*` and still boots on `hf`.
+3. Push. v2.4.1 resolves `auto` → `cf` (check `GET /version` → `"embedding_backend": "cf"`).
+4. Optionally pin `EMBEDDING_BACKEND=cf` and delete the `HF_*` variables.
+
+---
+
 ## [2.4.0] — 2026-09-30 · Latency & memory release
 
 **Prompt:** `v2.3.0 → v2.4.0` · **App:** `2.1.0 → 2.4.0` · **Answer quality:** unchanged by design (no prompt coverage removed, same models, same retrieval set when MMR is off)

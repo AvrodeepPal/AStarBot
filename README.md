@@ -29,19 +29,19 @@ Design principles: **grounded** (context only), **bounded** (refuse out of scope
 ## Quick start
 
 ```bash
-cp .env.example .env            # fill PINECONE_API_KEY, GROQ_API_KEY (+ HF_TOKEN for HF embeddings)
+cp .env.example .env            # fill PINECONE_API_KEY, GROQ_API_KEY (+ CF_API_TOKEN, CF_ACCOUNT_ID)
 make dev                        # pip install -e ".[dev,ui,local-embed]" with CPU torch
-make install                    # …or: API + UI only, no torch (needs HF_TOKEN)
+make install                    # …or: API + UI only, no torch (needs CF_*)
 make embed                      # (re)build the Pinecone index from data/*.json
 make calibrate                  # check on-/off-topic score separation (offline)
 make cli                        # python -m interfaces.cli
 make ui                         # streamlit run interfaces/streamlit_app.py
 make api                        # python main.py  → http://localhost:8000
-make test                       # pytest (offline; Pinecone/Groq/HF are mocked)
-make check-embed                # HF API vs local BGE vectors should match (cosine ≥ 0.999)
+make test                       # pytest (offline; Pinecone/Groq/Cloudflare are mocked)
+make check-embed                # Cloudflare vs local BGE vectors should match (cosine ≥ 0.999)
 ```
 
-Requires Python ≥ 3.11 (3.12 recommended). Query embeddings run either through the Hugging Face Inference API (`EMBEDDING_BACKEND=hf`, no torch) or in-process (`local`, needs the `[local-embed]` extra; the first run downloads `BAAI/bge-base-en-v1.5`, ~440 MB, into `HF_HOME`). `auto` (default) picks `hf` whenever `HF_TOKEN` is set. Document embedding (`make embed`) and `make calibrate` always run locally. See [CHANGELOG.md](CHANGELOG.md) for what changed in v2.4.0 and why.
+Requires Python ≥ 3.11 (3.12 recommended). Query embeddings run either through Cloudflare Workers AI (`EMBEDDING_BACKEND=cf`, no torch, free tier of 10,000 requests/day) or in-process (`local`, needs the `[local-embed]` extra and ~1 GB RAM; the first run downloads `BAAI/bge-base-en-v1.5`, ~440 MB, into `HF_HOME`). Both use the same model, so the Pinecone index is shared. `auto` (default) picks `cf` when both `CF_API_TOKEN` and `CF_ACCOUNT_ID` are set, otherwise `local`. Document embedding (`make embed`) and `make calibrate` always run locally. See [CHANGELOG.md](CHANGELOG.md) for what changed and why.
 
 ### API
 
@@ -167,7 +167,7 @@ One JSON object per line (`rag/log.py`). `chat_done` records carry `request_id` 
 
 ## Deployment
 
-- **Railway / Docker** (runs the API): `docker build -t astarbot .` — multi-stage, **slim by default** (no torch; set `HF_TOKEN` and `EMBEDDING_BACKEND=hf`), jemalloc allocator, non-root, healthcheck on `/health`, `CMD python main.py` (one supervised worker recycled every `WORKER_MAX_REQUESTS`). `--build-arg INSTALL_LOCAL_EMBED=true` builds the torch image with BGE baked in for `EMBEDDING_BACKEND=local` (needs ~1 GB RAM). Set env vars from `.env.example` in the dashboard (`PORT` is injected). If the dashboard has a custom Start Command, clear it so the Dockerfile `CMD` runs.
+- **Railway / Docker** (runs the API): `docker build -t astarbot .` — multi-stage, **slim by default** (no torch; set `CF_API_TOKEN`, `CF_ACCOUNT_ID` and `EMBEDDING_BACKEND=cf`), jemalloc allocator, non-root, healthcheck on `/health`, `CMD python main.py` (one supervised worker recycled every `WORKER_MAX_REQUESTS`). `--build-arg INSTALL_LOCAL_EMBED=true` builds the torch image with BGE baked in for `EMBEDDING_BACKEND=local` (needs ~1 GB RAM). Set env vars from `.env.example` in the dashboard (`PORT` is injected). If the dashboard has a custom Start Command, clear it so the Dockerfile `CMD` runs.
 - **Streamlit Community Cloud** (runs the UI): main file `interfaces/streamlit_app.py`. It's a thin HTTP client against the Railway API that streams answers from `/chat/stream` and pings `/health` in the background on page load to wake a sleeping container. Put `ASTARBOT_API_URL = "https://<your-railway-domain>"` in *Secrets*; it's bridged into the environment at startup. The default `requirements.txt` (`-e .[ui]`) no longer pulls in torch, so it fits the 1 GB tier as is.
 - **Frontend**: set `FRONTEND_ORIGIN` to the portfolio origin(s), comma-separated.
 

@@ -7,10 +7,12 @@ os.environ.setdefault("PINECONE_API_KEY", "test-pinecone-key")
 os.environ.setdefault("GROQ_API_KEY", "test-groq-key")
 os.environ.setdefault("ENABLE_PROMPT_GUARD_LLM", "false")
 os.environ.setdefault("LOG_LEVEL", "WARNING")
-# Tests never reach a real embedder; pin the backend so a developer's HF_TOKEN
+# Tests never reach a real embedder; pin the backend so a developer's CF_*
 # in .env can't change which class build_embedder() returns.
 os.environ.setdefault("EMBEDDING_BACKEND", "local")
-os.environ.setdefault("HF_TOKEN", "")
+os.environ.setdefault("CF_API_TOKEN", "")
+os.environ.setdefault("CF_ACCOUNT_ID", "")
+os.environ.setdefault("CF_POOLING", "cls")
 
 import pytest  # noqa: E402
 

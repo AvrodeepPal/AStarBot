@@ -2,18 +2,19 @@
 
 Two implementations behind one interface (`embed_query` / `aembed_query`):
 
-    LocalBGEEmbedder   sentence-transformers in-process. Needs the
-                       `[local-embed]` extra (torch); ~800 MB resident.
-    HFEmbedder         Hugging Face Inference API. Needs HF_TOKEN only;
-                       nothing model-sized is ever loaded into RAM.
+    LocalBGEEmbedder     sentence-transformers in-process. Needs the
+                         `[local-embed]` extra (torch); ~800 MB resident.
+    CloudflareEmbedder   Cloudflare Workers AI. Needs CF_API_TOKEN and
+                         CF_ACCOUNT_ID; nothing model-sized is ever loaded
+                         into RAM; free tier is 10,000 requests/day.
 
 Both return a unit-length `settings.embedding_dim` vector for the SAME model
 (BAAI/bge-base-en-v1.5), so switching backends never touches the Pinecone
 index. BGE is asymmetric: the query prefix is applied here, documents are
 embedded without it (scripts/embed.py, which always runs locally).
 
-`settings.embedding_backend` picks the backend ("auto" = HF when HF_TOKEN is
-set). The torch import is deferred to `load_embedder`, so an "hf" process
+`settings.embedding_backend` picks the backend ("auto" = CF when both CF_*
+are set). The torch import is deferred to `load_embedder`, so a "cf" process
 never imports it even when it is installed.
 """
 
@@ -40,7 +41,7 @@ def load_embedder():
     except ImportError as exc:  # slim install without the [local-embed] extra
         raise EmbedderError(
             "Local embeddings need the [local-embed] extra (pip install -e '.[local-embed]'), "
-            "or set HF_TOKEN / EMBEDDING_BACKEND=hf to use the Hugging Face API."
+            "or set CF_API_TOKEN + CF_ACCOUNT_ID / EMBEDDING_BACKEND=cf to use Cloudflare Workers AI."
         ) from exc
 
     log.info(
@@ -60,7 +61,7 @@ def load_embedder():
 
 
 def _unit(vec: list[float]) -> list[float]:
-    """L2-normalise so HF and local vectors are interchangeable for cosine search."""
+    """L2-normalise so API and local vectors are interchangeable for cosine search."""
     norm = math.sqrt(sum(x * x for x in vec))
     return [x / norm for x in vec] if norm else vec
 
@@ -84,71 +85,83 @@ class LocalBGEEmbedder:
         return await asyncio.to_thread(self.embed_query, query)
 
 
-class HFEmbedder:
-    """Hugging Face Inference API (hf-inference provider, feature-extraction).
+class CloudflareEmbedder:
+    """Cloudflare Workers AI (`@cf/baai/bge-base-en-v1.5`).
 
-    Free-tier accounts get a small monthly credit and are rate-limited, which
-    is ample for a portfolio bot. 503 (model loading) and 429 (rate limit) are
-    retried with exponential backoff; anything else fails fast. One pooled
-    `requests.Session` keeps the TLS connection warm between queries.
+    Same model as the local backend. Two details keep its vectors in the
+    index's space: the request asks for CLS pooling (Workers AI defaults to
+    mean, sentence-transformers' BGE uses CLS), and the output is
+    L2-normalised client-side. 429 and 5xx are retried with exponential
+    backoff; other 4xx (bad token, wrong account ID) fail fast.
+
+    Response: {"result": {"shape": [1, 768], "data": [[...]], "pooling": "cls"},
+               "success": true, "errors": [], "messages": []}
     """
 
-    backend = "hf"
+    backend = "cf"
 
     def __init__(self) -> None:
-        if not settings.hf_token:
-            raise EmbedderError("EMBEDDING_BACKEND=hf requires HF_TOKEN to be set")
-        self.url = settings.hf_embedding_endpoint
+        if not settings.cf_api_token or not settings.cf_account_id:
+            raise EmbedderError("EMBEDDING_BACKEND=cf requires CF_API_TOKEN and CF_ACCOUNT_ID")
+        self.url = settings.cf_embedding_endpoint
         self.session = requests.Session()
-        self.session.headers.update({"Authorization": f"Bearer {settings.hf_token}"})
+        self.session.headers.update({"Authorization": f"Bearer {settings.cf_api_token}"})
 
-    def _parse(self, data) -> list[float]:
-        # A single string input returns a flat vector; tolerate a batch of one.
-        if isinstance(data, list) and data and isinstance(data[0], list):
-            data = data[0]
-        if not isinstance(data, list) or not data or not isinstance(data[0], int | float):
-            raise EmbedderError(f"Unexpected HF response shape: {str(data)[:120]}")
-        if len(data) != settings.embedding_dim:
-            raise EmbedderError(f"HF returned {len(data)}-d, expected {settings.embedding_dim}")
-        return _unit([float(x) for x in data])
+    def _parse(self, body) -> list[float]:
+        if not isinstance(body, dict) or not body.get("success", False):
+            errors = body.get("errors") if isinstance(body, dict) else body
+            raise EmbedderError(f"Cloudflare returned success=false: {str(errors)[:200]}")
+        result = body.get("result")
+        # Documented shape is {"data": [[...]], "shape": [...]}; tolerate a bare list.
+        rows = result.get("data") if isinstance(result, dict) else result
+        if isinstance(rows, list) and rows and isinstance(rows[0], list):
+            rows = rows[0]
+        if not isinstance(rows, list) or not rows or not isinstance(rows[0], int | float):
+            raise EmbedderError(f"Unexpected Cloudflare response shape: {str(result)[:120]}")
+        if len(rows) != settings.embedding_dim:
+            raise EmbedderError(f"Cloudflare returned {len(rows)}-d, expected {settings.embedding_dim}")
+        pooling = result.get("pooling") if isinstance(result, dict) else None
+        if pooling not in (None, settings.cf_pooling):
+            raise EmbedderError(f"Cloudflare used {pooling} pooling, expected {settings.cf_pooling}")
+        return _unit([float(x) for x in rows])
 
     def embed_query(self, query: str) -> list[float]:
-        payload = {"inputs": settings.query_prefix + query}
+        payload = {"text": [settings.query_prefix + query], "pooling": settings.cf_pooling}
         last_err = "no attempt made"
-        for attempt in range(settings.hf_max_retries):
+        for attempt in range(settings.cf_max_retries):
             try:
-                r = self.session.post(self.url, json=payload, timeout=settings.hf_timeout_seconds)
+                r = self.session.post(self.url, json=payload, timeout=settings.cf_timeout_seconds)
             except requests.RequestException as exc:
                 last_err = str(exc)[:200]
-                log.warning("hf_embed_fail", extra={"attempt": attempt, "err": last_err})
+                log.warning("cf_embed_fail", extra={"attempt": attempt, "err": last_err})
                 time.sleep(min(2**attempt, 4))
                 continue
 
-            if r.status_code in (429, 503):
-                # 503: the model is being loaded on HF's side; 429: rate limited.
+            if r.status_code == 429 or r.status_code >= 500:
+                # 429: rate limited (daily free-tier cap or burst); 5xx: transient.
                 wait = min(2**attempt * (2 if r.status_code == 429 else 1), 8)
                 last_err = f"HTTP {r.status_code}"
                 log.warning(
-                    "hf_rate_limited" if r.status_code == 429 else "hf_model_loading",
-                    extra={"attempt": attempt, "wait_s": wait},
+                    "cf_rate_limited" if r.status_code == 429 else "cf_server_error",
+                    extra={"attempt": attempt, "status": r.status_code, "wait_s": wait},
                 )
                 time.sleep(wait)
                 continue
             if r.status_code >= 400:
                 # 401/403/404 will not fix themselves; don't burn retries on them.
-                raise EmbedderError(f"HF embedding HTTP {r.status_code}: {r.text[:200]}")
+                raise EmbedderError(f"Cloudflare embedding HTTP {r.status_code}: {r.text[:200]}")
             return self._parse(r.json())
 
-        raise EmbedderError(f"HF embedding failed after {settings.hf_max_retries} attempts: {last_err}")
+        raise EmbedderError(
+            f"Cloudflare embedding failed after {settings.cf_max_retries} attempts: {last_err}"
+        )
 
     async def aembed_query(self, query: str) -> list[float]:
-        # Blocking HTTP (with its retry sleeps) in a worker thread; callers
-        # can await it alongside the guard LLM without blocking the loop.
         return await asyncio.to_thread(self.embed_query, query)
 
 
-def build_embedder() -> LocalBGEEmbedder | HFEmbedder:
+def build_embedder() -> LocalBGEEmbedder | CloudflareEmbedder:
     """Return the embedder for the configured (resolved) backend."""
     backend = settings.resolved_embedding_backend
     log.info("embedder_backend", extra={"backend": backend, "model": settings.embedding_model})
-    return HFEmbedder() if backend == "hf" else LocalBGEEmbedder()
+    return CloudflareEmbedder() if backend == "cf" else LocalBGEEmbedder()

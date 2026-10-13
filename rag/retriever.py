@@ -1,7 +1,7 @@
 """Query embedding + Pinecone top-k retrieval, with an in-process LRU cache.
 
 The query encoder is BAAI/bge-base-en-v1.5 (768-d), run either in-process or
-via the Hugging Face Inference API (`rag.embedder`); the retriever does not
+via Cloudflare Workers AI (`rag.embedder`); the retriever does not
 care which. BGE is asymmetric: queries carry `settings.query_prefix`,
 documents do not, and the prefix lives in exactly one place (`rag.embedder`).
 

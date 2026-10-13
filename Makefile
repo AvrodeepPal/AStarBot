@@ -2,10 +2,10 @@
 	docker-build docker-build-local docker-run
 
 PYTHON ?= python
-VERSION := 2.4.0
+VERSION := 2.4.1
 TORCH_CPU := --extra-index-url https://download.pytorch.org/whl/cpu
 
-# API + UI with Hugging Face embeddings (no torch).
+# API + UI with Cloudflare Workers AI embeddings (no torch).
 install:
 	$(PYTHON) -m pip install -e ".[ui]"
 
@@ -35,7 +35,7 @@ embed-dry:
 calibrate:
 	$(PYTHON) -m scripts.calibrate
 
-# Compare HF Inference API vectors with local BGE (needs HF_TOKEN + local-embed).
+# Compare Cloudflare Workers AI vectors with local BGE (needs CF_* + local-embed).
 check-embed:
 	$(PYTHON) -m scripts.check_embedder
 
@@ -45,7 +45,7 @@ test:
 lint:
 	$(PYTHON) -m ruff check .
 
-# Slim image for EMBEDDING_BACKEND=hf (Railway).
+# Slim image for EMBEDDING_BACKEND=cf (Railway).
 docker-build:
 	docker build -t astarbot:$(VERSION) .
 

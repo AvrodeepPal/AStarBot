@@ -30,23 +30,30 @@ class Settings(BaseSettings):
     pinecone_index_name: str = "astarbot"
     pinecone_namespace: str = "astarbot"
 
-    # ---- Embedding (local BGE or Hugging Face Inference API) -------------
+    # ---- Embedding (local BGE or Cloudflare Workers AI) ------------------
     # Where the QUERY encoder runs. Same model and dimension either way, so the
     # Pinecone index never changes; only the process that encodes does.
-    #   "hf"    Hugging Face Inference API; needs HF_TOKEN; no torch in RAM
+    #   "cf"    Cloudflare Workers AI; needs CF_API_TOKEN + CF_ACCOUNT_ID;
+    #           no torch in RAM; free tier is 10,000 requests/day
     #   "local" sentence-transformers in-process; needs the [local-embed] extra
-    #   "auto"  "hf" when HF_TOKEN is set, otherwise "local"
+    #   "auto"  "cf" when both CF_* are set, otherwise "local"
     embedding_backend: str = "auto"
     embedding_model: str = "BAAI/bge-base-en-v1.5"
     embedding_dim: int = 768
     embedding_device: str = "cpu"  # "cuda" / "mps" if available
     # BGE is asymmetric: this prefix goes on QUERIES only, never on documents.
     query_prefix: str = "Represent this sentence for searching relevant passages: "
-    hf_token: str = ""
-    # Empty = derived from EMBEDDING_MODEL (see `hf_embedding_endpoint`).
-    hf_embedding_url: str = ""
-    hf_timeout_seconds: float = 15.0
-    hf_max_retries: int = Field(default=3, ge=1, le=6)
+    # Cloudflare Workers AI. The token needs the "Workers AI" permission; the
+    # account ID is the 32-hex string in the dashboard URL (not in the token).
+    cf_api_token: str = ""
+    cf_account_id: str = ""
+    cf_embedding_model: str = "@cf/baai/bge-base-en-v1.5"
+    # Workers AI defaults to MEAN pooling, but sentence-transformers' BGE (which
+    # built the Pinecone index) uses CLS pooling, and Cloudflare documents the
+    # two as incompatible. "cls" is what keeps CF vectors in the index's space.
+    cf_pooling: str = "cls"
+    cf_timeout_seconds: float = 15.0
+    cf_max_retries: int = Field(default=3, ge=1, le=6)
 
     # ---- Retrieval -------------------------------------------------------
     top_k: int = 5
@@ -149,10 +156,18 @@ class Settings(BaseSettings):
     @classmethod
     def _check_backend(cls, v: str) -> str:
         # Fail at startup: a typo silently falling back to "local" would load
-        # torch on a 512 MB container, the exact thing "hf" exists to avoid.
+        # torch on a 512 MB container, the exact thing "cf" exists to avoid.
         v = v.strip().lower()
-        if v not in {"auto", "hf", "local"}:
-            raise ValueError("EMBEDDING_BACKEND must be 'auto', 'hf' or 'local'")
+        if v not in {"auto", "cf", "local"}:
+            raise ValueError("EMBEDDING_BACKEND must be 'auto', 'cf' or 'local'")
+        return v
+
+    @field_validator("cf_pooling")
+    @classmethod
+    def _check_cf_pooling(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in {"cls", "mean"}:
+            raise ValueError("CF_POOLING must be 'cls' or 'mean'")
         return v
 
     @field_validator("reasoning_effort")
@@ -162,16 +177,17 @@ class Settings(BaseSettings):
 
     @property
     def resolved_embedding_backend(self) -> str:
-        """The backend actually used: "auto" resolved against HF_TOKEN."""
+        """The backend actually used: "auto" resolved against the CF credentials."""
         if self.embedding_backend == "auto":
-            return "hf" if self.hf_token else "local"
+            return "cf" if self.cf_api_token and self.cf_account_id else "local"
         return self.embedding_backend
 
     @property
-    def hf_embedding_endpoint(self) -> str:
-        return self.hf_embedding_url or (
-            f"https://router.huggingface.co/hf-inference/models/{self.embedding_model}"
-            "/pipeline/feature-extraction"
+    def cf_embedding_endpoint(self) -> str:
+        """Workers AI REST URL for the configured model. The '@' stays unencoded."""
+        return (
+            f"https://api.cloudflare.com/client/v4/accounts/{self.cf_account_id}"
+            f"/ai/run/{self.cf_embedding_model}"
         )
 
     @property

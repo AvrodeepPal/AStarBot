@@ -79,7 +79,7 @@ def test_chat_injection_refused(client):
 
 def test_version_exposes_v240_fields(client):
     body = client.get("/version").json()
-    assert body["embedding_backend"] in {"local", "hf"}
+    assert body["embedding_backend"] in {"local", "cf"}
     assert body["streaming_enabled"] is settings.enable_streaming_endpoint
     assert body["retrieval_cache_size"] == settings.retrieval_cache_size
     assert body["client_window"]["summary_trigger_after"] == settings.summary_trigger_after

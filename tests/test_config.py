@@ -5,27 +5,34 @@ from rag.config import Settings
 
 
 def test_backend_is_normalised():
-    assert Settings(embedding_backend=" HF ").embedding_backend == "hf"
+    assert Settings(embedding_backend=" CF ").embedding_backend == "cf"
+    assert Settings(embedding_backend="Local").embedding_backend == "local"
 
 
-def test_unknown_backend_fails_fast():
+@pytest.mark.parametrize("bad", ["hf", "huggingface", "cloudflare"])
+def test_unknown_backend_fails_fast(bad):
     with pytest.raises(ValidationError):
-        Settings(embedding_backend="huggingface")
+        Settings(embedding_backend=bad)
 
 
-def test_auto_backend_resolves_on_hf_token():
-    assert Settings(embedding_backend="auto", hf_token="").resolved_embedding_backend == "local"
-    assert Settings(embedding_backend="auto", hf_token="hf_x").resolved_embedding_backend == "hf"
+def test_auto_backend_resolves_on_cf_credentials():
+    cf = {"cf_api_token": "t", "cf_account_id": "a"}
+    assert Settings(embedding_backend="auto", **cf).resolved_embedding_backend == "cf"
+    # both CF values are needed; one alone falls through to local
+    for half in ({"cf_api_token": "t", "cf_account_id": ""}, {"cf_api_token": "", "cf_account_id": "a"}):
+        assert Settings(embedding_backend="auto", **half).resolved_embedding_backend == "local"
     # an explicit choice always wins
-    assert Settings(embedding_backend="local", hf_token="hf_x").resolved_embedding_backend == "local"
+    assert Settings(embedding_backend="local", **cf).resolved_embedding_backend == "local"
 
 
-def test_hf_endpoint_derived_from_model_unless_overridden():
-    s = Settings(embedding_model="BAAI/bge-base-en-v1.5", hf_embedding_url="")
-    assert s.hf_embedding_endpoint == (
-        "https://router.huggingface.co/hf-inference/models/BAAI/bge-base-en-v1.5/pipeline/feature-extraction"
+def test_cf_endpoint_and_pooling():
+    s = Settings(cf_account_id="abc123", cf_embedding_model="@cf/baai/bge-base-en-v1.5")
+    assert s.cf_embedding_endpoint == (
+        "https://api.cloudflare.com/client/v4/accounts/abc123/ai/run/@cf/baai/bge-base-en-v1.5"
     )
-    assert Settings(hf_embedding_url="https://example.test/e").hf_embedding_endpoint == "https://example.test/e"
+    assert Settings(cf_pooling=" CLS ").cf_pooling == "cls"
+    with pytest.raises(ValidationError):
+        Settings(cf_pooling="max")
 
 
 def test_v240_latency_defaults(monkeypatch):
