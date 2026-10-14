@@ -39,9 +39,9 @@ log = logging.getLogger("astarbot.api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Builds the embedder (local model or HF client) and connects to Pinecone
+    # Builds the embedder (local model or Cloudflare client) and connects to Pinecone
     # once per process. The warm-up runs in the background so /health answers
-    # as soon as the engine exists; it wakes the HF model, opens the Pinecone
+    # as soon as the engine exists; it wakes the embedder, opens the Pinecone
     # connection and seeds the retrieval cache.
     app.state.engine = RAGEngine()
     warmup = asyncio.create_task(app.state.engine.warmup())

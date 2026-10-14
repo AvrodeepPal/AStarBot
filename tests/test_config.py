@@ -35,7 +35,7 @@ def test_cf_endpoint_and_pooling():
         Settings(cf_pooling="max")
 
 
-def test_v240_latency_defaults(monkeypatch):
+def test_latency_defaults(monkeypatch):
     for var in ("MMR_LAMBDA", "RECENT_TURNS_IN_PROMPT", "REASONING_EFFORT", "RETRIEVAL_CACHE_SIZE"):
         monkeypatch.delenv(var, raising=False)
     s = Settings(_env_file=None)

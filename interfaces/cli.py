@@ -13,6 +13,7 @@ Commands:
 import logging
 
 from interfaces.session import trim_window
+from rag import __version__
 from rag.config import settings
 from rag.engine import RAGEngine
 from rag.log import setup_logging
@@ -35,7 +36,10 @@ def run_cli() -> None:
     setup_logging("DEBUG" if settings.debug else "WARNING")
     logging.getLogger("astarbot").setLevel(logging.DEBUG if settings.debug else logging.WARNING)
 
-    print(f"AStarBot CLI  ·  prompt {PROMPT_VERSION}  ·  {settings.primary_llm_model}  ·  k={settings.top_k}")
+    print(
+        f"AStarBot CLI v{__version__}  ·  prompt {PROMPT_VERSION}  ·  "
+        f"{settings.primary_llm_model}  ·  k={settings.top_k}"
+    )
     print(HELP + "\n")
 
     engine = RAGEngine()

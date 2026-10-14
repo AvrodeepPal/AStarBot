@@ -12,7 +12,7 @@ On Streamlit Community Cloud, secrets are exposed via `st.secrets`; they are
 copied into the environment below so `ASTARBOT_API_URL` is visible to
 `os.environ.get`.
 
-Latency handling (v2.4.0):
+Latency handling:
     - once per browser session a background thread pings /health, so a
       Railway container that went to sleep starts waking while the visitor
       is still reading the page, not after they press Enter
@@ -155,7 +155,8 @@ def reset_conversation() -> None:
 
 # ---- sidebar -------------------------------------------------------------
 with st.sidebar:
-    st.header("AStarBot v2 · beta")
+    app_version = (version_info or {}).get("version")
+    st.header(f"AStarBot v{app_version} · beta" if app_version else "AStarBot · beta")
     if version_info:
         st.markdown(
             f"- **Prompt:** `{version_info['prompt_version']}`\n"

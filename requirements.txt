@@ -1,8 +1,7 @@
 # Thin shim for platforms that only read requirements.txt (Streamlit Community
 # Cloud). Dependencies are declared once in pyproject.toml.
 #
-# Since v2.4.0 the core install has no torch / sentence-transformers (they
-# moved to the [local-embed] extra), so this is light enough for Streamlit
-# Cloud's 1 GB tier and the separate requirements-streamlit.txt is gone.
+# The core install has no torch / sentence-transformers (they live in the
+# [local-embed] extra), so this fits Streamlit Cloud's 1 GB tier.
 # The Railway image installs from pyproject.toml directly (see Dockerfile).
 -e .[ui]

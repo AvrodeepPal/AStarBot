@@ -1,176 +1,169 @@
-# AStarBot v2.4 — Grounded, Bounded, Stateless Portfolio Assistant
+# AStarBot
 
-AStarBot is a Retrieval-Augmented Generation (RAG) backend that answers questions about **Avrodeep Pal** — education, projects, skills, interests — from a curated knowledge base. It is deliberately *not* a general chatbot: every fact comes from retrieved context, everything else is politely refused, and the server keeps no session state.
+**A grounded, bounded, stateless RAG assistant for a personal portfolio.**
+
+AStarBot answers visitors' questions about Avrodeep Pal (education, work, projects, skills and interests) from a curated knowledge base. It is deliberately *not* a general chatbot. Every fact comes from retrieved context, anything out of scope is politely refused, and the server keeps no session state.
+
+![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-009688)
+![Pinecone](https://img.shields.io/badge/vectors-Pinecone-6f42c1)
+![Groq](https://img.shields.io/badge/LLM-Groq-f55036)
+![Tests](https://img.shields.io/badge/tests-163%20passing-brightgreen)
+![Version](https://img.shields.io/badge/version-2.4.1-informational)
+
+> Technical reference (snippets, configuration, test suite, Makefile targets, directory layout, deployment details): **[APPENDIX.md](APPENDIX.md)**.
+
+---
+
+## Why it exists
+
+A portfolio chatbot has a narrow job, and most of the risk is in what it says *outside* that job: invented facts, private details, or a jailbroken persona. AStarBot is built around six principles:
+
+| Principle | What it means here |
+|---|---|
+| **Grounded** | Answers come only from retrieved context. If it isn't in the knowledge base, the bot says so. |
+| **Bounded** | Off-topic, private and unsafe questions get fixed, consistent refusals. |
+| **Stateless** | No Redis, no database, no server sessions. The client carries the conversation. |
+| **Deterministic** | No agents, no tool calling, no LangGraph. One fixed pipeline. |
+| **Auditable** | A layered, versioned prompt and one JSON log line per event. |
+| **Explicit** | Failures fall back through plain `try/except` paths that are visible in the code. |
+
+---
+
+## How it works
 
 ```
 Client (React / Streamlit / CLI)          holds: recent_messages[], summary
-        │  POST /chat or /chat/stream {question, recent_messages, summary}
+        │  POST /chat  or  /chat/stream
         ▼
-FastAPI  interfaces/api.py  (async)       request_id, CORS, strict schemas
+FastAPI (async)                           request id, CORS, strict schemas
         ▼
-RAGEngine  rag/engine.py
-   1. input guardrails      sanitise, cap lengths, whitelist roles
+RAGEngine
+   1. input guardrails       sanitise, cap lengths, whitelist roles
    2. regex injection screen
-   3. follow-up rewrite     retrieval query only
-   4. prompt-guard LLM   ┐  llama-prompt-guard-2-86m (fail-open)
-   5. retrieval          ┘  concurrent · LRU cache → BGE-base 768-d (HF API or local) → Pinecone top-5
-   6. prompt + LLM chain    gpt-oss-20b → gpt-oss-120b → static fallback  (streamed on /chat/stream)
-   7. output guardrails     strip leaks, cap length  (incremental when streaming)
-   8. summarise (if window full)   gpt-oss-20b, temp 0  (/summarize for streaming clients)
-        │  {answer, updated_summary}  or  text/plain token stream
+   3. follow-up rewrite      for the retrieval query only
+   4. prompt-guard LLM   ┐   run concurrently
+   5. retrieval          ┘   LRU cache → BGE embeddings → Pinecone → re-rank
+   6. LLM chain              primary → fallback → static fallback (streamable)
+   7. output guardrails      strip leaks, cap length (incremental when streaming)
+   8. summarise              only when the client's window is full
+        │
         ▼
-Client trims its window and sends the summary back next turn
+{answer, updated_summary}  or  a plain-text token stream
 ```
 
-Design principles: **grounded** (context only), **bounded** (refuse out of scope), **stateless** (no Redis/DB), **deterministic** (no agents/tools), **auditable** (layered versioned prompt, JSON logs), **explicit** (plain try/except fallbacks).
+- **Retrieval.** Each knowledge-base entry is a single vector, with no chunking. Query embeddings come from `BAAI/bge-base-en-v1.5`, served either by Cloudflare Workers AI or by a local sentence-transformers model. Pinecone over-fetches candidates, which are then re-ranked by cosine similarity plus an editorial priority.
+- **Generation.** Groq serves a small primary model, a larger fallback and a prompt-guard classifier. If every tier fails, the user gets a fixed "technical snag" message, never a stack trace.
+- **Memory.** The client keeps a short message window and a rolling summary written by the server. The server never stores either.
+- **Safety.** Input is screened twice, first by a regex and then by a guard model. Output is sanitised so prompt markers or reasoning tags can't leak, even mid-stream.
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Language | Python 3.11+ (3.12 in Docker and the devcontainer) |
+| API | FastAPI + Uvicorn (one supervised, recycled worker) |
+| Vector store | Pinecone serverless, 768-d, cosine |
+| Embeddings | BGE-base-en-v1.5 via Cloudflare Workers AI, or local sentence-transformers |
+| LLMs | Groq: `gpt-oss-20b` (primary), `gpt-oss-120b` (fallback), `llama-prompt-guard-2-86m` (guard) |
+| Orchestration | `langchain-core` / `langchain-groq` (message types and the client only) |
+| Config | `pydantic-settings`, environment variables or `.env` |
+| UI | Streamlit beta client, terminal CLI, plus an external React portfolio frontend |
+| Hosting | Railway (API, Docker) and Streamlit Community Cloud (UI) |
+| Tooling | pytest, ruff, Make, Docker, devcontainer |
 
 ---
 
 ## Quick start
 
 ```bash
-cp .env.example .env            # fill PINECONE_API_KEY, GROQ_API_KEY (+ CF_API_TOKEN, CF_ACCOUNT_ID)
-make dev                        # pip install -e ".[dev,ui,local-embed]" with CPU torch
-make install                    # …or: API + UI only, no torch (needs CF_*)
-make embed                      # (re)build the Pinecone index from data/*.json
-make calibrate                  # check on-/off-topic score separation (offline)
-make cli                        # python -m interfaces.cli
-make ui                         # streamlit run interfaces/streamlit_app.py
-make api                        # python main.py  → http://localhost:8000
-make test                       # pytest (offline; Pinecone/Groq/Cloudflare are mocked)
-make check-embed                # Cloudflare vs local BGE vectors should match (cosine ≥ 0.999)
+git clone https://github.com/AvrodeepPal/AStarBot.git
+cd AStarBot
+cp .env.example .env     # add PINECONE_API_KEY, GROQ_API_KEY, CF_API_TOKEN, CF_ACCOUNT_ID
+
+make dev                 # install everything (tests, UI, local embeddings)
+make test                # offline test suite; no keys needed
+make embed               # build the Pinecone index from data/*.json
+make api                 # http://localhost:8000
+make ui                  # Streamlit client on http://localhost:8501
 ```
 
-Requires Python ≥ 3.11 (3.12 recommended). Query embeddings run either through Cloudflare Workers AI (`EMBEDDING_BACKEND=cf`, no torch, free tier of 10,000 requests/day) or in-process (`local`, needs the `[local-embed]` extra and ~1 GB RAM; the first run downloads `BAAI/bge-base-en-v1.5`, ~440 MB, into `HF_HOME`). Both use the same model, so the Pinecone index is shared. `auto` (default) picks `cf` when both `CF_API_TOKEN` and `CF_ACCOUNT_ID` are set, otherwise `local`. Document embedding (`make embed`) and `make calibrate` always run locally. See [CHANGELOG.md](CHANGELOG.md) for what changed and why.
-
-### API
-
-| Method | Path       | Body / Response |
-|--------|------------|-----------------|
-| POST   | `/chat`    | `{question, recent_messages?: [{role, content}], summary?}` → `{answer, updated_summary}` |
-| POST   | `/chat/stream` | same body → `text/plain; charset=utf-8` token stream (no summary; `ENABLE_STREAMING_ENDPOINT`) |
-| POST   | `/summarize` | `{recent_messages, summary?}` → `{updated_summary}` (no-op below `SUMMARY_TRIGGER_AFTER`) |
-| GET    | `/health`  | `{"status": "ok"}` |
-| GET    | `/version` | app/prompt version, models, embedding backend, streaming flag, cache size, initial message, client window policy |
-
-Limits (422 if exceeded): question ≤ 500 chars, ≤ 20 messages of ≤ 2000 chars, roles `user`/`assistant`, summary ≤ 2000 chars. Every response carries `X-Request-Id`.
+For a lighter install with no torch, which needs Cloudflare credentials, run `make install` in place of `make dev`. The full list of targets is in the [appendix](APPENDIX.md#3-makefile-reference).
 
 ---
 
-## Stateless memory contract (clients must follow)
+## API at a glance
 
-1. Start with `recent_messages = [initial assistant message]`, `summary = null`.
-2. After each `/chat`, append the user turn and the answer.
-3. If `updated_summary` **differs** from the summary you sent, keep only the last **4** turns (`MESSAGES_AFTER_SUMMARY`); otherwise keep the last **12** (`MAX_RECENT_MESSAGES`).
-4. Send `updated_summary` back as `summary` on the next request.
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/chat` | Answer a question; returns `{answer, updated_summary}` |
+| `POST` | `/chat/stream` | Same pipeline, streamed as `text/plain` |
+| `POST` | `/summarize` | Fold a full client window into a fresh summary (for streaming clients) |
+| `GET` | `/health` | Liveness check |
+| `GET` | `/version` | App and prompt versions, models, embedding backend, client window policy |
 
-The server summarises when it receives ≥ `SUMMARY_TRIGGER_AFTER` (10) turns. `interfaces/session.py` is the reference implementation; mirror it in the React hook.
+```bash
+curl -s localhost:8000/chat -H 'Content-Type: application/json' \
+  -d '{"question": "What projects has he built?"}'
+```
 
-**Streaming clients** (`/chat/stream`) get text only, no `updated_summary`. After rendering the answer, if the window (including the new exchange) has ≥ `client_window.summary_trigger_after` messages, call `POST /summarize` and treat its `updated_summary` exactly as in step 3. `interfaces/streamlit_app.py` does this.
-
-Below that threshold the model still sees the last `RECENT_TURNS_IN_PROMPT` (2) messages, i.e. the previous question and its answer, rendered as `ROLE: text` lines inside the user turn (never as real assistant messages, so a forged history carries no authority). Follow-ups that lean on a referent ("how did he do **it**", "and the results?") also get the previous user question prepended to the *retrieval* query only (`rag/followup.py`), so the vector search carries the topic while the model answers the question as typed.
+Requests are strictly validated (question ≤ 500 characters, ≤ 20 history messages), and every response carries an `X-Request-Id` header. Schemas and the client memory contract are documented in the [appendix](APPENDIX.md#5-api-reference).
 
 ---
 
-## Knowledge base
+## Project layout
 
-`data/*.json` — six files, one vector per entry, no chunking. Every file is globbed, so adding one needs no code change.
-
-```json
-{ "meta": { "source": "faq", "last_updated": "2026-09-21" },
-  "entries": [ { "id": "faq-gate", "title": "Is he preparing for GATE?", "question": "…", "text": "…",
-                 "links": ["https://…"], "tags": ["gate"], "aliases": ["gate plans"], "priority": 5 } ] }
+```
+AStarBot/
+├── main.py            Uvicorn launcher (supervised single worker)
+├── rag/               Core pipeline: config, guardrails, prompt, embedder,
+│                      retriever, LLM chain, memory, orchestrator
+├── interfaces/        FastAPI app, Streamlit client, CLI, shared window policy
+├── scripts/           Index rebuild, score calibration, embedder parity check
+├── data/              Knowledge base, one JSON file per topic
+├── tests/             Offline unit and API tests
+├── Dockerfile         Multi-stage image (slim by default)
+├── Makefile           Every common command
+└── APPENDIX.md        Technical reference
 ```
 
-`rag/knowledge.py` is the schema contract. Two derived strings are deliberately different:
-
-- **embedded** (`embedding_text`): `title + question + text + aliases` — the title makes a chunk like "Not right now…" unambiguous, and aliases only help retrieval if they're inside the vector.
-- **shown to the LLM** (`context_block`): `title + text + Links:` — clean text, no ids/tags/aliases.
-
-Pinecone metadata: `text, title, question, links, tags, priority, last_verified, source`.
-
-`make embed` parses and embeds **everything first**, then clears namespace `astarbot` and upserts — a malformed file aborts before anything is deleted, and entries removed from JSON leave no stale vectors. `make embed-dry` does the same without touching Pinecone. The script refuses to write to an index whose dimension ≠ 768.
-
-Pinecone index: `astarbot` · 768-d · cosine · aws us-east-1 · namespace `astarbot`.
+A file-by-file breakdown is in the [appendix](APPENDIX.md#2-directory-structure).
 
 ---
-
-## Retrieval
-
-Four stages, because Pinecone only does the first:
-
-0. LRU cache (`RETRIEVAL_CACHE_SIZE`, 64): a repeat of the same retrieval query (case/whitespace-insensitive) skips steps 1–4. Only non-empty results are cached; the cache is per worker and resets on redeploy or recycle.
-1. Query → `QUERY_PREFIX + question` → BGE-base (HF API or local) → over-fetch `FETCH_K` (10) candidates.
-2. Drop anything below `MIN_RETRIEVAL_SCORE` on the **raw** cosine score.
-3. Re-rank by `cosine + PRIORITY_WEIGHT × priority` (0.02 × 2..5 = up to 0.06 — reorders near-ties, never overturns a clear winner).
-4. Optional MMR down to `TOP_K` (5) with `MMR_LAMBDA` < 1.0: each next pick is `λ·relevance − (1−λ)·max-cosine-to-already-picked`, so `faq-gate` doesn't take a slot when `self-gate` is already in. **Off by default since v2.4.0** (`MMR_LAMBDA=1.0`) because calibration shows no duplicate crowding and MMR needs every candidate's raw vector returned by Pinecone; set `0.7` to re-enable.
-
-An embedder or Pinecone failure (e.g. an HF rate limit) is answered with `STATIC_FALLBACK` ("technical snag"), not the off-topic refusal.
-
-**`MIN_RETRIEVAL_SCORE` defaults to 0.0, and that's measured, not lazy.** `make calibrate` runs 32 real questions and 8 off-topic ones against the current data with no network: worst on-topic 0.498, best off-topic 0.617 ("recipe for biryani" is genuinely close to `pers-food`). The distributions overlap, so no threshold separates them and refusal belongs to the prompt's SCOPE block. It also checks a few canary questions for entries that must *not* surface (the growth-area entry once leaked into "what is he working on now" because its title collided). Re-run after editing the knowledge base; raise the threshold only if the groups actually separate.
-
-## Prompt (`rag/prompt.py`, `PROMPT_VERSION`)
-
-Eight fixed-order blocks: identity → scope → grounding → domain discipline → injection defense → refusal taxonomy → style/length → summary + recent exchange + context + question. Blocks 1–7 ride in the system turn; block 8 (all untrusted material) in the user turn. Bump `PROMPT_VERSION` on any wording change; it is logged per request and exposed at `/version`.
-
-Domain discipline keeps the four threads (job, research, GATE, personal) apart — a question about his work doesn't get his GATE plans appended, and the weakness entry is used only when weaknesses are asked about. Style matches depth to the verb ("what is X" → a line; "explain X" → the numbers the entry actually holds, up to 120 words) and forbids grading his skills ("highly proficient") — the model describes what he built and lets the visitor judge.
-
-Refusal strings are constants (`REFUSAL_OFFTOPIC`, `REFUSAL_UNSAFE`, `REFUSAL_JAILBREAK`, `STATIC_FALLBACK`) so responses are consistent whether the guardrail or the model produces them. Private/compensation refusals come in three variants (`REFUSAL_PRIVATE_VARIANTS`), each ending in the same `CONTACT_POINTER` to the portfolio's Contact Me section; the model picks the opener that fits the tone and avoids the one it used last.
-
-## LLM tiers (Groq)
-
-| Tier | Model | Job |
-|------|-------|-----|
-| guard | `meta-llama/llama-prompt-guard-2-86m` | jailbreak probability on the raw question; ≥ `GUARD_THRESHOLD` → refuse. Fail-open. |
-| primary | `openai/gpt-oss-20b` | grounded answer (`REASONING_EFFORT=low`) |
-| fallback | `openai/gpt-oss-120b` | any primary exception, or a primary stream that fails before its first token |
-| summarizer | `openai/gpt-oss-20b` @ temp 0 | 3–5 line memory summary |
-
-All models are env-configurable. The guard runs concurrently with retrieval; neither reads the other's output, so results are identical to running them in turn. gpt-oss cannot disable reasoning: `low` is the fastest setting, and an empty `REASONING_EFFORT` falls back to the provider default (medium).
-
-## Logging
-
-One JSON object per line (`rag/log.py`). `chat_done` records carry `request_id` (the API's `X-Request-Id`), `prompt_version`, `embedding_model`, `embedding_backend`, `top_k`, `retrieval_top_score`, `llm_tier_used` (0 primary, 1 fallback, −1 all failed), `outcome`, `latency_ms`, `stream`, and for streams `ttft_ms` (time to first token). `retrieval_cache` records carry `hit`, `size`, running `hits`/`misses`. Raw questions appear only at `DEBUG`.
-
----
-
-## Layout
-
-```
-.
-├── main.py                    uvicorn launcher: one supervised, recycled worker
-├── rag/
-│   ├── config.py              typed Settings from env
-│   ├── log.py                 JSON logging
-│   ├── guardrails.py          input/output sanitisation, injection regex
-│   ├── prompt.py              8-block versioned prompt, refusal constants
-│   ├── knowledge.py           entry schema → embedding text / metadata / context block
-│   ├── followup.py            follow-up → standalone retrieval query
-│   ├── embedder.py            query embeddings: HF Inference API or local BGE
-│   ├── retriever.py           Pinecone + re-rank + MMR + LRU cache
-│   ├── llm.py                 guard / primary / fallback / summarizer chain
-│   ├── memory.py              summarisation
-│   └── engine.py              orchestrator
-├── interfaces/
-│   ├── api.py                 FastAPI
-│   ├── streamlit_app.py       beta UI
-│   ├── cli.py                 terminal client
-│   └── session.py             shared client window policy
-├── scripts/embed.py           index rebuild (--dry-run)
-├── scripts/calibrate.py       score-distribution check for MIN_RETRIEVAL_SCORE
-├── scripts/check_embedder.py  HF API vs local BGE parity check
-├── data/*.json                knowledge base (self, experience, projects, studies, personality, faq)
-├── tests/                     offline unit + API tests
-├── Dockerfile · .dockerignore · Makefile · pyproject.toml · .env.example · CHANGELOG.md
-├── requirements.txt            -e .[ui] for Streamlit Cloud (no torch since v2.4.0)
-```
 
 ## Deployment
 
-- **Railway / Docker** (runs the API): `docker build -t astarbot .` — multi-stage, **slim by default** (no torch; set `CF_API_TOKEN`, `CF_ACCOUNT_ID` and `EMBEDDING_BACKEND=cf`), jemalloc allocator, non-root, healthcheck on `/health`, `CMD python main.py` (one supervised worker recycled every `WORKER_MAX_REQUESTS`). `--build-arg INSTALL_LOCAL_EMBED=true` builds the torch image with BGE baked in for `EMBEDDING_BACKEND=local` (needs ~1 GB RAM). Set env vars from `.env.example` in the dashboard (`PORT` is injected). If the dashboard has a custom Start Command, clear it so the Dockerfile `CMD` runs.
-- **Streamlit Community Cloud** (runs the UI): main file `interfaces/streamlit_app.py`. It's a thin HTTP client against the Railway API that streams answers from `/chat/stream` and pings `/health` in the background on page load to wake a sleeping container. Put `ASTARBOT_API_URL = "https://<your-railway-domain>"` in *Secrets*; it's bridged into the environment at startup. The default `requirements.txt` (`-e .[ui]`) no longer pulls in torch, so it fits the 1 GB tier as is.
-- **Frontend**: set `FRONTEND_ORIGIN` to the portfolio origin(s), comma-separated.
+- **API on Railway (Docker).** The default image is slim and has no torch, so it fits a 512 MB container using the Cloudflare embedding backend. It runs as a non-root user, has a `/health` healthcheck, and uses jemalloc to keep memory flat.
+- **UI on Streamlit Community Cloud.** The UI is a thin HTTP client that streams answers from the API and wakes a sleeping container in the background on page load.
+- **Portfolio frontend.** Any origin listed in `FRONTEND_ORIGIN` can call the API directly.
 
-## What this project intentionally does not do
+Step-by-step settings are in the [appendix](APPENDIX.md#9-deployment).
 
-No agents, tool calling, LangGraph, auth, server-side sessions, Redis, model-based reranking, chunking, or fine-tuning. Complexity is earned, not assumed. (Streaming was earned in v2.4.0.)
+---
+
+## Testing
+
+The suite runs fully offline. Pinecone, Groq, Cloudflare and the embedding model are all stubbed.
+
+```bash
+make test     # 163 tests
+make lint     # ruff
+```
+
+It covers guardrails, prompt assembly, retrieval ranking and caching, embedder retries, streaming sanitisation, the concurrency of the guard and retrieval steps, and every API route. There is a per-file breakdown in the [appendix](APPENDIX.md#7-test-suite).
+
+---
+
+## What it intentionally does not do
+
+No agents, tool calling, auth, server-side sessions, Redis, model-based reranking, chunking or fine-tuning. Complexity is earned, not assumed. Streaming, async execution and caching were added only after measurement showed they were needed.
+
+---
+
+## Author
+
+Built by **Avrodeep Pal** · [GitHub](https://github.com/AvrodeepPal)
+
+To ask about the person rather than the code, ask the bot.

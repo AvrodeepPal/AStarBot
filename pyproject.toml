@@ -8,7 +8,7 @@ version = "2.4.1"
 description = "RAG-based portfolio chatbot — grounded, bounded, stateless"
 readme = "README.md"
 requires-python = ">=3.11"
-# Core = what the API needs with EMBEDDING_BACKEND=hf. No torch.
+# Core = what the API needs with EMBEDDING_BACKEND=cf. No torch.
 dependencies = [
     "python-dotenv>=1.0.0",
     "pydantic>=2.6.0",

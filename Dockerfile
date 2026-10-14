@@ -1,7 +1,7 @@
 # ---------- Stage 1: builder ----------
 # Installs everything into a self-contained venv.
 #
-# Default (INSTALL_LOCAL_EMBED=false): slim image for EMBEDDING_BACKEND=hf.
+# Default (INSTALL_LOCAL_EMBED=false): slim image for EMBEDDING_BACKEND=cf.
 # No torch, no sentence-transformers, no model weights.
 #
 # --build-arg INSTALL_LOCAL_EMBED=true: adds the [local-embed] extra (CPU-only

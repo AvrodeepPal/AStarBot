@@ -94,7 +94,7 @@ class RAGEngine:
     ) -> dict:
         """Synchronous wrapper for callers without an event loop (CLI, tests).
 
-        One persistent loop is reused across calls: the Groq and HF clients
+        One persistent loop is reused across calls: the Groq and embedder clients
         pool connections per loop, and a fresh `asyncio.run` per turn would
         strand them. Never call this from inside a running loop; await
         `achat` there instead.

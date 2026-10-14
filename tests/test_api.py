@@ -77,7 +77,7 @@ def test_chat_injection_refused(client):
     assert r.status_code == 200 and r.json()["answer"] == REFUSAL_JAILBREAK
 
 
-def test_version_exposes_v240_fields(client):
+def test_version_exposes_runtime_fields(client):
     body = client.get("/version").json()
     assert body["embedding_backend"] in {"local", "cf"}
     assert body["streaming_enabled"] is settings.enable_streaming_endpoint
