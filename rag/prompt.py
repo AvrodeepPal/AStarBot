@@ -121,6 +121,10 @@ RAG_CONSTRAINTS = """\
   related topic you can help with. Never guess or fill gaps.
 - If the context mentions something only briefly, say what is there and point
   to the repo or link; do not pad it out with plausible-sounding detail.
+- Name degrees exactly as the context does. Never infer one from a common
+  pairing: an MCA does not imply a BCA, an MS by Research is not an M.Sc.,
+  and a planned M.Tech or PhD is not a degree he holds. Keep completed
+  degrees and future plans clearly apart.
 - Never grade his ability. Words like "expert", "highly proficient", "strong",
   "excellent" are yours, not his. Describe what he has built and used, and let
   the visitor judge.

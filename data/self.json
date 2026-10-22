@@ -3,8 +3,8 @@
     "source": "self",
     "description": "Identity, education, location, current status and career decisions.",
     "owner": "Avrodeep Pal",
-    "last_updated": "2026-09-21",
-    "version": 4
+    "last_updated": "2026-10-22",
+    "version": 5
   },
   "entries": [
     {
@@ -19,7 +19,7 @@
     {
       "id": "self-now",
       "title": "What I'm doing now",
-      "text": "As of September 2026 my main thing is my job at GenAIus: backend infrastructure and multimodal model integration. On the side, an independent research project on reasoning models, and GATE 2028 preparation in the background. I'm not open to other work opportunities right now and I don't do freelance.",
+      "text": "As of September 2026 my main thing is my job at GenAIus: backend infrastructure and multimodal model integration. On the side, an independent research project on reasoning models, and GATE 2028 preparation for an M.Tech in the background. I'm not open to other work opportunities right now and I don't do freelance.",
       "links": ["https://github.com/AvrodeepPal"],
       "tags": ["now","current","currently","what are you working on","status","latest","2026","gate 2028","availability","focus"],
       "aliases": ["what is he doing now","current status","what's he up to","is he available"],
@@ -39,12 +39,12 @@
     {
       "id": "self-gate",
       "title": "GATE and higher studies",
-      "text": "I qualified GATE in both 2024 and 2025 — just past the cutoff, as practice runs with little preparation, to get familiar with the exam before a serious attempt. I then shifted that serious attempt from 2026 to 2028 so I could get industry experience first, which was the right call. GATE 2028 is the target now. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models, rather than a standard M.Tech. The research route matters more to me than the degree name.",
+      "text": "I qualified GATE in both 2024 and 2025 — just past the cutoff, as practice runs with little preparation, to get familiar with the exam before a serious attempt. I then shifted that serious attempt from 2026 to 2028 so I could get industry experience first, which was the right call. GATE 2028 is the target now, for an M.Tech at an institute with good research scope — the department and its labs matter more to me than the name, and an MS by Research would do the same job if the lab is right. The M.Tech is a means to research: a thesis on reasoning models, and recommendations from faculty who have seen my work, so I can apply abroad for a PhD or a research role afterwards.",
       "links": [],
-      "tags": ["gate","gate 2028","higher studies","masters","ms research","phd","research assistant","exam","preparation","iisc","iit","future plans"],
-      "aliases": ["is he preparing for gate","gate plans","does he want to do a phd","higher studies","is he gate qualified","did he clear gate","his gate score","gate result"],
+      "tags": ["gate","gate 2028","higher studies","masters","mtech","m.tech","ms research","ms(r)","phd","phd abroad","research abroad","research role","recommendation","exam","preparation","iisc","iit","future plans"],
+      "aliases": ["is he preparing for gate","gate plans","does he want to do a phd","higher studies","is he gate qualified","did he clear gate","his gate score","gate result","is he doing mtech","will he go abroad","his plan after gate"],
       "priority": 5,
-      "last_verified": "2026-09-21"
+      "last_verified": "2026-10-22"
     },
     {
       "id": "self-research-aspirations",
@@ -58,18 +58,18 @@
     {
       "id": "edu-masters-mca",
       "title": "MCA at Jadavpur University",
-      "text": "Master of Computer Applications at Jadavpur University, Kolkata, October 2024 to July 2026, under the CSE department. Graduated First Class with CGPA 8.90 out of 10. Alongside coursework I was Placement Coordinator for the batch, presented a seminar on reasoning models, and did my thesis on cross-lingual Bengali idiom matching under Prof. Diganta Saha.",
+      "text": "Master of Computer Applications at Jadavpur University, Kolkata, October 2024 to July 2026, under the CSE department. Graduated First Class with CGPA 8.90 out of 10 (81.76%); semester SGPAs were 8.33, 8.57, 8.68 and 10.00, rising every semester. Alongside coursework I was Placement Coordinator for the batch, presented a seminar on reasoning models, and did my thesis on cross-lingual Bengali idiom matching under Prof. Diganta Saha.",
       "links": [],
-      "tags": ["masters","mca","postgraduate","jadavpur university","ju","kolkata","cgpa","8.90","first class","education","degree","thesis","seminar"],
+      "tags": ["masters","mca","postgraduate","jadavpur university","ju","kolkata","cgpa","8.90","sgpa","first class","education","degree","thesis","seminar"],
       "aliases": ["where did he do his masters","his mca","jadavpur"],
       "priority": 4
     },
     {
       "id": "edu-bachelors-bsc",
       "title": "B.Sc. Computer Science (Hons.)",
-      "text": "B.Sc. Computer Science (Honours) at Barrackpore Rastraguru Surendranath College, under West Bengal State University, October 2021 to August 2024. CGPA 9.91 out of 10 and 1st rank in Computer Science across WBSU. The syllabus gave me the foundations I still lean on: operating systems, networks, DBMS, data structures.",
+      "text": "B.Sc. Computer Science (Honours) at Barrackpore Rastraguru Surendranath College, under West Bengal State University, October 2021 to August 2024 — a B.Sc., not a BCA. CGPA 9.91 out of 10 (88.65% equivalent) and 1st rank in Computer Science across WBSU; semester SGPAs were 10.00, 10.00, 9.77, 9.77, 10.00 and 10.00. The syllabus gave me the foundations I still lean on: operating systems, networks, DBMS, data structures.",
       "links": [],
-      "tags": ["bachelors","bsc","undergraduate","computer science honours","barrackpore rastraguru surendranath college","wbsu","cgpa","9.91","rank 1","topper","education","degree"],
+      "tags": ["bachelors","bsc","undergraduate","computer science honours","barrackpore rastraguru surendranath college","wbsu","cgpa","9.91","sgpa","rank 1","topper","education","degree"],
       "aliases": ["where did he do his bachelors","his bsc","undergraduate degree"],
       "priority": 4
     },
@@ -112,7 +112,7 @@
     {
       "id": "self-career-decisions",
       "title": "Choices I've made and why",
-      "text": "I chose MCA over an M.Sc. for employability and engineering-faculty exposure. When two offers landed I took the remote startup role over a larger company's information-security position that needed relocation about 2000 km from home — partly family proximity, partly because a small team means touching the whole stack, which is what happened. GATE 2024 and 2025 I qualified as practice runs; 2026 I skipped deliberately for industry experience.",
+      "text": "I chose MCA over an M.Sc. for employability and engineering-faculty exposure. When two offers landed I took the remote startup role over a larger company's information-security position that needed relocation about 2000 km from home — partly family proximity, partly because a small team means touching the whole stack, which is what happened. GATE 2024 and 2025 I qualified as practice runs; 2026 I skipped deliberately for industry experience. For higher studies I'm going M.Tech first rather than straight to a PhD abroad, so the application has a research thesis and faculty recommendations behind it.",
       "links": [],
       "tags": ["career","decisions","choices","why","mca vs msc","job offers","remote","relocation","gate","planning","reasoning"],
       "aliases": ["why did he choose","his career decisions","why genaius"],

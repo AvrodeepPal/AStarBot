@@ -45,6 +45,9 @@ ON_TOPIC = [
     "What is he working on right now?",
     "Tell me about his LeetCode practice",
     "What research is he doing?",
+    "What was his SGPA in each semester?",
+    "Did he do BCA before MCA?",
+    "Is he doing an M.Tech or MS?",
     # Queries real visitors typed that once failed or mis-ranked:
     "any hobbies",
     "does he watch anime",

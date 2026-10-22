@@ -3,8 +3,8 @@
     "source": "faq",
     "description": "Literal questions visitors ask, with short direct answers.",
     "owner": "Avrodeep Pal",
-    "last_updated": "2026-09-21",
-    "version": 2
+    "last_updated": "2026-10-22",
+    "version": 3
   },
   "entries": [
     {
@@ -73,22 +73,34 @@
       "id": "faq-gate",
       "title": "Is Avrodeep preparing for GATE?",
       "question": "Is Avrodeep preparing for GATE or higher studies?",
-      "text": "Yes — GATE 2028 is his main target. He qualified GATE in 2024 and 2025 as practice runs, then moved his serious attempt to 2028 to get industry experience first. The goal afterwards is an MS(Research) or research assistant position at an Indian AI lab working on reasoning models.",
+      "text": "Yes — GATE 2028 is his main target, for an M.Tech at an institute with good research scope; an MS by Research is the alternative if the lab fits. He qualified GATE in 2024 and 2025 as practice runs, then moved his serious attempt to 2028 to get industry experience first. The longer plan is to use the M.Tech thesis and faculty recommendations to go abroad for a PhD or research role on reasoning models.",
       "links": [],
-      "tags": ["gate","gate 2028","higher studies","masters","ms research","research assistant","exam","academia","faq"],
-      "aliases": ["is he preparing for gate","gate plans","higher studies plans","is he gate qualified","did he clear gate"],
+      "tags": ["gate","gate 2028","higher studies","masters","mtech","m.tech","ms research","phd abroad","exam","academia","faq"],
+      "aliases": ["is he preparing for gate","gate plans","higher studies plans","is he gate qualified","did he clear gate","is he doing mtech"],
       "priority": 5,
-      "last_verified": "2026-09-21"
+      "last_verified": "2026-10-22"
     },
     {
       "id": "faq-phd",
       "title": "Does Avrodeep want to do a PhD?",
       "question": "Is Avrodeep planning a PhD?",
-      "text": "Possibly, but not immediately. The near-term plan is an MS(Research) or research assistant position after GATE 2028, which will tell him whether full-time research is the right fit before committing several years to a PhD.",
+      "text": "Yes, eventually — but not right now, and not directly. The route is an M.Tech after GATE 2028 at an institute with good research scope, then a PhD or research role abroad on reasoning models, with the M.Tech research and faculty recommendations behind the application. He doesn't hold a PhD and isn't enrolled in one.",
       "links": [],
-      "tags": ["phd","doctorate","graduate school","research career","future plans","faq"],
-      "aliases": ["is he doing a phd","does he want a phd","phd plans"],
-      "priority": 4
+      "tags": ["phd","doctorate","graduate school","phd abroad","research abroad","research role","research career","future plans","faq"],
+      "aliases": ["is he doing a phd","does he want a phd","phd plans","is he a phd student","will he study abroad"],
+      "priority": 4,
+      "last_verified": "2026-10-22"
+    },
+    {
+      "id": "faq-degrees",
+      "title": "What degrees does Avrodeep have?",
+      "question": "Did Avrodeep do a BCA, M.Sc. or PhD?",
+      "text": "Two: a B.Sc. Computer Science (Honours) from West Bengal State University (CGPA 9.91, 1st rank in CS) and an MCA from Jadavpur University (CGPA 8.90, First Class). No BCA — the MCA followed a B.Sc. No M.Sc. either. He has no M.Tech or PhD yet; the M.Tech is the next step through GATE 2028, and a PhD or research role abroad is the longer-term aim.",
+      "links": [],
+      "tags": ["degrees","qualifications","education","bsc","mca","bca","msc","mtech","phd","highest qualification","faq"],
+      "aliases": ["did he do bca","does he have an msc","what is his highest qualification","what degrees does he hold","is he bca mca"],
+      "priority": 4,
+      "last_verified": "2026-10-22"
     },
     {
       "id": "faq-publications",

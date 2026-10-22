@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "source": "academics",
+    "description": "Degree path, semester-wise SGPA and subject-wise results for the B.Sc. and MCA.",
+    "owner": "Avrodeep Pal",
+    "last_updated": "2026-10-22",
+    "version": 1,
+    "note": "Transcribed from the official grade cards. Roll numbers, registration numbers and serial numbers are deliberately excluded."
+  },
+  "entries": [
+    {
+      "id": "acad-degree-path",
+      "title": "My degree path, and what it isn't",
+      "text": "Completed: B.Sc. Computer Science (Honours) under West Bengal State University, 2021–2024, then MCA (Master of Computer Applications) at Jadavpur University, 2024–2026. That's the whole list so far. It was B.Sc. then MCA — not a BCA, and I never did an M.Sc.; I chose the MCA over one. I don't hold an M.Tech or a PhD and I'm not enrolled in either. Next: GATE 2028 for an M.Tech at an institute with good research scope, with an MS by Research as the alternative if the lab is the right one. An MS by Research, or MS(R), is the thesis-based research master's at IITs and IISc — it is not an M.Sc. Further out: a PhD or research role abroad, on reasoning models.",
+      "links": [],
+      "tags": ["degrees","degree path","education","qualifications","bsc","mca","bca","msc","mtech","m.tech","ms research","ms(r)","msr","phd","higher studies","future plans","timeline"],
+      "aliases": ["did he do bca","did he do bca and mca","does he have an msc","is he doing msc","is he doing mtech","does he have a phd","is he a phd student","is ms research the same as msc","what degrees does he have","what is his highest qualification","his academic path"],
+      "priority": 5,
+      "last_verified": "2026-10-22"
+    },
+    {
+      "id": "acad-bsc-sgpa",
+      "title": "B.Sc. semester-wise SGPA and CGPA",
+      "text": "B.Sc. Computer Science (Honours), West Bengal State University, CBCS, six semesters, 140 credits. SGPA by semester: Sem 1 — 10.00 (20 credits); Sem 2 — 10.00 (20); Sem 3 — 9.77 (26); Sem 4 — 9.77 (26); Sem 5 — 10.00 (24); Sem 6 — 10.00 (24). Final CGPA 9.91 out of 10, which WBSU's conversion rule puts at 88.65%, and 1st rank in Computer Science across WBSU. Every semester cleared first time with no back papers. Most papers are theory plus practical marked together out of 75; an O (grade point 10) needs 60 of 75. The two 9.77 semesters each had a single A+ (9) — Physics in Sem 3 and DBMS in Sem 4. Every other paper was an O.",
+      "links": [],
+      "tags": ["bsc","bachelors","undergraduate","wbsu","sgpa","cgpa","9.91","88.65","percentage","semester wise","grades","marks","academic record","rank 1","no backlogs","education"],
+      "aliases": ["his bsc sgpa","sgpa in each semester","semester wise sgpa","semester wise results","all semester results","bsc cgpa","bsc percentage","his undergraduate grades","did he have any backlogs"],
+      "priority": 4
+    },
+    {
+      "id": "acad-bsc-sem1",
+      "title": "B.Sc. Semester 1 results (2021–22)",
+      "text": "B.Sc. Semester 1, exam session 2021–22. SGPA 10.00 over 20 credits. Programming Fundamentals using C/C++ (core): 74/75, O. Computer System Architecture (core): 73/75, O. Mathematics (generic elective): 62/75, O. Environmental Studies (AECC): 22/25, O.",
+      "links": [],
+      "tags": ["bsc","semester 1","first semester","sem 1","marks","grades","sgpa","c","c++","programming fundamentals","computer system architecture","mathematics","environmental studies"],
+      "aliases": ["bsc first semester marks","his marks in c programming","computer architecture marks"],
+      "priority": 3
+    },
+    {
+      "id": "acad-bsc-sem2",
+      "title": "B.Sc. Semester 2 results (2022)",
+      "text": "B.Sc. Semester 2, exam session 2022. SGPA 10.00 over 20 credits. Programming in Java (core): 70/75, O. Discrete Structures (core): 70/75, O. Mathematics (generic elective): 69/75, O. English (AECC): 21/25, O.",
+      "links": [],
+      "tags": ["bsc","semester 2","second semester","sem 2","marks","grades","sgpa","java","discrete structures","discrete mathematics","mathematics","english"],
+      "aliases": ["bsc second semester marks","his marks in java","discrete maths marks"],
+      "priority": 3
+    },
+    {
+      "id": "acad-bsc-sem3",
+      "title": "B.Sc. Semester 3 results (2022–23)",
+      "text": "B.Sc. Semester 3, exam session 2022–23. SGPA 9.77 over 26 credits. Data Structures (core): 63/75, O. Operating Systems (core): 72/75, O. Computer Networks (core): 64/75, O. Physics (generic elective): 53/75, A+. Programming in Python (skill enhancement course): 25/25, O.",
+      "links": [],
+      "tags": ["bsc","semester 3","third semester","sem 3","marks","grades","sgpa","data structures","operating systems","os","computer networks","networking","physics","python"],
+      "aliases": ["bsc third semester marks","his marks in operating systems","data structures marks","computer networks marks"],
+      "priority": 3
+    },
+    {
+      "id": "acad-bsc-sem4",
+      "title": "B.Sc. Semester 4 results (2023)",
+      "text": "B.Sc. Semester 4, exam session 2023. SGPA 9.77 over 26 credits. Design and Analysis of Algorithms (core): 66/75, O. Software Engineering (core): 63/75, O. DBMS (core): 59/75, A+. Physics (generic elective): 60/75, O. R Programming (skill enhancement course): 25/25, O.",
+      "links": [],
+      "tags": ["bsc","semester 4","fourth semester","sem 4","marks","grades","sgpa","algorithms","daa","design and analysis of algorithms","software engineering","dbms","database","physics","r programming"],
+      "aliases": ["bsc fourth semester marks","his marks in algorithms","dbms marks"],
+      "priority": 3
+    },
+    {
+      "id": "acad-bsc-sem5",
+      "title": "B.Sc. Semester 5 results (2023–24)",
+      "text": "B.Sc. Semester 5, exam session 2023–24. SGPA 10.00 over 24 credits. Internet Technology (core): 73/75, O. Theory of Computation (core): 68/75, O. Microprocessors (elective): 71/75, O. Data Mining (elective): 65/75, O. The elective I didn't take that semester was Cloud Computing.",
+      "links": [],
+      "tags": ["bsc","semester 5","fifth semester","sem 5","marks","grades","sgpa","internet technology","theory of computation","toc","automata","microprocessor","8085","data mining","electives"],
+      "aliases": ["bsc fifth semester marks","his marks in theory of computation","data mining marks"],
+      "priority": 3
+    },
+    {
+      "id": "acad-bsc-sem6",
+      "title": "B.Sc. Semester 6 results (2024)",
+      "text": "B.Sc. Semester 6, exam session 2024. SGPA 10.00 over 24 credits. Artificial Intelligence (core): 60/75, O. Computer Graphics (core): 64/75, O. Digital Image Processing (elective): 67/75, O. Final-year project: 71/75, O — that was the LSTM stock-forecasting project. The elective I didn't take was Big Data.",
+      "links": ["https://github.com/AvrodeepPal/Time_Series_Analysis_LSTM"],
+      "tags": ["bsc","semester 6","sixth semester","sem 6","final semester","marks","grades","sgpa","artificial intelligence","ai","computer graphics","digital image processing","project","final year project"],
+      "aliases": ["bsc sixth semester marks","his marks in ai","bsc project marks"],
+      "priority": 3
+    },
+    {
+      "id": "acad-mca-sgpa",
+      "title": "MCA semester-wise SGPA and CGPA",
+      "text": "MCA at Jadavpur University, CSE department, two years and four semesters, 74 credits. SGPA by semester: Sem 1 — 8.33 (21 credits, Feb–Mar 2025); Sem 2 — 8.57 (23 credits, Apr–May 2025); Sem 3 — 8.68 (22 credits, Dec 2025); Sem 4 — 10.00 (8 credits, Apr–May 2026, seminar and project). It went up every semester. Final CGPA 8.90 out of 10, with JU weighting all four SGPAs equally; weighted average 81.76% and First Class. Every semester passed first time, and the bridge course was waived. JU grade cards give letter grades, not marks. Grade points: S = 10, A = 9, B = 8, C = 7, D = 6. Theory papers carry 3 credits, labs 2.",
+      "links": [],
+      "tags": ["mca","masters","postgraduate","jadavpur university","ju","sgpa","cgpa","8.90","81.76","percentage","first class","semester wise","grades","academic record","education"],
+      "aliases": ["his mca sgpa","sgpa in each semester","semester wise sgpa","mca semester wise results","all semester results","mca cgpa","mca percentage","his masters grades"],
+      "priority": 4
+    },
+    {
+      "id": "acad-mca-sem1",
+      "title": "MCA Semester 1 grades (Feb–Mar 2025)",
+      "text": "MCA Semester 1, exams February–March 2025. SGPA 8.33 over 21 credits. Theory: Programming Fundamentals and Object-Oriented Concepts — A. Mathematical Foundations — D. Management Information Systems — B. Digital Systems — C. Graph Theory and Combinatorics — A. Labs: Programming Practice I — A. Digital Systems Lab — S. Communication Skills and Language Lab — S.",
+      "links": [],
+      "tags": ["mca","semester 1","first semester","sem 1","grades","sgpa","oop","object oriented","mathematical foundations","management information systems","mis","digital systems","graph theory","combinatorics","labs"],
+      "aliases": ["mca first semester grades","his grade in graph theory","mca maths grade"],
+      "priority": 3
+    },
+    {
+      "id": "acad-mca-sem2",
+      "title": "MCA Semester 2 grades (Apr–May 2025)",
+      "text": "MCA Semester 2, exams April–May 2025. SGPA 8.57 over 23 credits. Theory: Data Structures and Algorithms — B. Advanced Programming with Java and Python — B. Computer Organization and Architecture — B. Operating Systems — B. Database Management Systems — A. Labs: Data Structures and Algorithms Lab — A. Operating Systems Lab — A. Database Management Systems Lab — S. Advanced Programming Lab — A.",
+      "links": [],
+      "tags": ["mca","semester 2","second semester","sem 2","grades","sgpa","data structures","algorithms","dsa","java","python","computer organization","architecture","operating systems","os","dbms","database","labs"],
+      "aliases": ["mca second semester grades","his grade in dsa","mca dbms grade"],
+      "priority": 3
+    },
+    {
+      "id": "acad-mca-sem3",
+      "title": "MCA Semester 3 grades (Dec 2025)",
+      "text": "MCA Semester 3, exams December 2025. SGPA 8.68 over 22 credits. Theory: Software Engineering — C. Automata and Language Processors — A. Data Communication and Computer Networks — B. Electives: Pattern Recognition — B. Web Technologies — S. Bioinformatics — A. Labs: Software Engineering Lab — S. Data Communication and Computer Networks Lab — A.",
+      "links": [],
+      "tags": ["mca","semester 3","third semester","sem 3","grades","sgpa","software engineering","automata","compilers","language processors","computer networks","data communication","pattern recognition","web technologies","bioinformatics","electives","labs"],
+      "aliases": ["mca third semester grades","his grade in pattern recognition","mca electives"],
+      "priority": 3
+    },
+    {
+      "id": "acad-mca-sem4",
+      "title": "MCA Semester 4 grades (Apr–May 2026)",
+      "text": "MCA final semester, exams April–May 2026. SGPA 10.00 over 8 credits. Seminar (2 credits) — S; that was the seminar on reasoning models. Project (6 credits) — S; that was the thesis on cross-lingual Bengali idiom matching under Prof. Diganta Saha.",
+      "links": ["https://github.com/AvrodeepPal/Cross-Lingual-Bengali-Idiom-Matching-Using-Multilingual-Sentence-Embeddings-Without-Translation"],
+      "tags": ["mca","semester 4","fourth semester","final semester","sem 4","grades","sgpa","seminar","project","thesis","reasoning models","bengali idioms"],
+      "aliases": ["mca final semester grades","his thesis grade","mca project grade"],
+      "priority": 3
+    }
+  ]
+}

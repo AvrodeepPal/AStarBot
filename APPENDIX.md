@@ -82,8 +82,8 @@ AStarBot/
 │   ├── embed.py                Rebuild the Pinecone namespace from data/*.json (--dry-run)
 │   ├── calibrate.py            On-topic vs off-topic score distributions (offline)
 │   └── check_embedder.py       Cloudflare vs local BGE cosine parity check
-├── data/                       Knowledge base: self, experience, projects, studies,
-│                               personality, faq (*.json, about 84 entries in total)
+├── data/                       Knowledge base: self, academics, experience, projects,
+│                               studies, personality, faq (*.json, about 98 entries)
 ├── tests/                      14 test modules plus conftest.py (all offline)
 ├── .devcontainer/              Codespaces / VS Code container definition
 ├── Dockerfile                  Multi-stage build: slim (default) or local-embed
@@ -487,7 +487,7 @@ A parse or model failure therefore aborts before anything is deleted, and entrie
 
 ### Calibration
 
-`make calibrate` embeds the knowledge base in memory and scores a fixed set of probe questions: 32 on-topic, 8 off-topic, and a few canaries for entries that must *not* surface. On the current data the worst on-topic score is about 0.50 and the best off-topic score is about 0.61. The two distributions overlap, so `MIN_RETRIEVAL_SCORE` stays at `0.0` and the prompt's scope block handles refusals. Re-run calibration after editing `data/`.
+`make calibrate` embeds the knowledge base in memory and scores a fixed set of probe questions: 35 on-topic, 8 off-topic, and a few canaries for entries that must *not* surface. On the current data the worst on-topic score is about 0.50 and the best off-topic score is about 0.61. The two distributions overlap, so `MIN_RETRIEVAL_SCORE` stays at `0.0` and the prompt's scope block handles refusals. Re-run calibration after editing `data/`.
 
 ### Embedder parity
 
