@@ -1,6 +1,6 @@
 """Structured JSON logging.
 
-Every record is emitted as one JSON object per line so Railway / Docker log
+Every record is emitted as one JSON object per line so Render / Docker log
 collectors can index it. Any `extra={...}` passed to a logger call is merged
 into the object, which is how `request_id`, `latency_ms`, etc. get attached.
 

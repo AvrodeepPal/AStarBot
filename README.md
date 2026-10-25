@@ -71,7 +71,7 @@ RAGEngine
 | Orchestration | `langchain-core` / `langchain-groq` (message types and the client only) |
 | Config | `pydantic-settings`, environment variables or `.env` |
 | UI | Streamlit beta client, terminal CLI, plus an external React portfolio frontend |
-| Hosting | Railway (API, Docker) and Streamlit Community Cloud (UI) |
+| Hosting | Render (API, Docker) and Streamlit Community Cloud (UI) |
 | Tooling | pytest, ruff, Make, Docker, devcontainer |
 
 ---
@@ -135,7 +135,7 @@ A file-by-file breakdown is in the [appendix](APPENDIX.md#2-directory-structure)
 
 ## Deployment
 
-- **API on Railway (Docker).** The default image is slim and has no torch, so it fits a 512 MB container using the Cloudflare embedding backend. It runs as a non-root user, has a `/health` healthcheck, and uses jemalloc to keep memory flat.
+- **API on Render (Docker web service).** The default image is slim and has no torch, so it fits Render's 512 MB free instance using the Cloudflare embedding backend. It runs as a non-root user, has a `/health` healthcheck, and uses jemalloc to keep memory flat. Free instances spin down after 15 minutes idle, so both clients ping the API on page load to start the wake-up early.
 - **UI on Streamlit Community Cloud.** The UI is a thin HTTP client that streams answers from the API and wakes a sleeping container in the background on page load.
 - **Portfolio frontend.** Any origin listed in `FRONTEND_ORIGIN` can call the API directly.
 

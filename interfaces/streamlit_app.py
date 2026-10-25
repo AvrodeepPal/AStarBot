@@ -2,10 +2,10 @@
 
     streamlit run interfaces/streamlit_app.py
 
-This talks to the AStarBot API (deployed on Railway) over HTTP rather than
+This talks to the AStarBot API (deployed on Render) over HTTP rather than
 instantiating RAGEngine in-process: the embedding model + torch don't fit in
 Streamlit Community Cloud's 1 GB RAM cap, and the whole point of the split is
-to run the engine on Railway. Point ASTARBOT_API_URL at the deployed API via
+to run the engine on Render. Point ASTARBOT_API_URL at the deployed API via
 Streamlit secrets; it falls back to a local FastAPI instance for dev.
 
 On Streamlit Community Cloud, secrets are exposed via `st.secrets`; they are
@@ -14,7 +14,7 @@ copied into the environment below so `ASTARBOT_API_URL` is visible to
 
 Latency handling:
     - once per browser session a background thread pings /health, so a
-      Railway container that went to sleep starts waking while the visitor
+      Render instance that spun down starts waking while the visitor
       is still reading the page, not after they press Enter
     - answers stream from POST /chat/stream and render token by token;
       a spinner covers only the wait for the first token
@@ -61,7 +61,7 @@ FALLBACK_INITIAL_MESSAGE = (
 
 
 # (connect, read) timeouts. The read timeout is the longest gap allowed
-# between bytes, which covers a Railway cold start before the first token.
+# between bytes, which covers a Render cold start before the first token.
 TIMEOUT = (15, 120)
 DEFAULT_SUMMARY_TRIGGER = 10  # mirrors SUMMARY_TRIGGER_AFTER if /version is unreachable
 

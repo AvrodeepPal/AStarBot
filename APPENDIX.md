@@ -31,7 +31,7 @@ App version `2.4.1` · Prompt version `v2.4.0` · Python ≥ 3.11
 | **Groq** | LLM inference | Guard, primary, fallback and summarizer tiers, all env-configurable |
 | **Cloudflare Workers AI** | Query embeddings (`cf` backend) | `@cf/baai/bge-base-en-v1.5`, free tier of 10,000 requests/day |
 | **sentence-transformers** | Query embeddings (`local` backend), document indexing, calibration | `BAAI/bge-base-en-v1.5`, about 440 MB of weights, about 1 GB RSS with torch |
-| **Railway** | Hosts the API | Docker deploy, `PORT` injected, optional app sleeping |
+| **Render** | Hosts the API | Docker web service, `PORT` injected, free instances spin down after 15 min idle |
 | **Streamlit Community Cloud** | Hosts the beta UI | Thin HTTP client, 1 GB tier |
 | **GitHub Codespaces / devcontainer** | Development environment | Python 3.12 Bookworm image |
 
@@ -83,7 +83,7 @@ AStarBot/
 │   ├── calibrate.py            On-topic vs off-topic score distributions (offline)
 │   └── check_embedder.py       Cloudflare vs local BGE cosine parity check
 ├── data/                       Knowledge base: self, academics, experience, projects,
-│                               studies, personality, faq (*.json, about 98 entries)
+│                               studies, personality, faq (*.json, about 99 entries)
 ├── tests/                      14 test modules plus conftest.py (all offline)
 ├── .devcontainer/              Codespaces / VS Code container definition
 ├── Dockerfile                  Multi-stage build: slim (default) or local-embed
@@ -475,6 +475,10 @@ Two derived strings are deliberately different:
 
 Pinecone metadata holds `source, text, title, question, links, tags, priority, last_verified`.
 
+### Withheld facts
+
+A fact that is deliberately kept private but gets asked often is written as an entry that says so, rather than left out. `self-age-birthday` is the example: it gives his age (24, as of October 2026) and states that the exact birthday is concealed, then points to the Contact Me section. Without such an entry, the question falls through to the generic private refusal. With it, the bot answers what is shared and declines the rest in one reply. Time-sensitive facts like age carry an "as of" date in the text and a `last_verified` date. Re-check them when you bump `meta.last_updated`.
+
 ### `make embed` order of operations
 
 1. Glob every `data/*.json` file, so adding a file needs no code change.
@@ -487,7 +491,7 @@ A parse or model failure therefore aborts before anything is deleted, and entrie
 
 ### Calibration
 
-`make calibrate` embeds the knowledge base in memory and scores a fixed set of probe questions: 35 on-topic, 8 off-topic, and a few canaries for entries that must *not* surface. On the current data the worst on-topic score is about 0.50 and the best off-topic score is about 0.61. The two distributions overlap, so `MIN_RETRIEVAL_SCORE` stays at `0.0` and the prompt's scope block handles refusals. Re-run calibration after editing `data/`.
+`make calibrate` embeds the knowledge base in memory and scores a fixed set of probe questions: 37 on-topic, 8 off-topic, and a few canaries for entries that must *not* surface. On the current data the worst on-topic score is about 0.50 and the best off-topic score is about 0.61. The two distributions overlap, so `MIN_RETRIEVAL_SCORE` stays at `0.0` and the prompt's scope block handles refusals. Re-run calibration after editing `data/`.
 
 ### Embedder parity
 
@@ -517,7 +521,7 @@ ENV LD_PRELOAD=/usr/local/lib/libjemalloc.so.2 \
 RUN ln -s "/usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2" /usr/local/lib/libjemalloc.so.2
 ```
 
-The symlink makes the same path work on amd64 (Railway) and arm64 (Apple silicon).
+The symlink makes the same path work on amd64 (Render) and arm64 (Apple silicon).
 
 ### Worker supervision (`main.py`)
 
@@ -533,18 +537,21 @@ Multiprocess(config, sockets=[sock]).run()
 
 The parent process holds the socket and never imports the app. When the worker reaches its limit, it drains in-flight requests, including open streams, and the supervisor respawns it in about 2 to 3 s. Connections that arrive in the meantime wait in the socket backlog rather than being refused. `WORKER_MAX_REQUESTS=0` runs a plain server with no recycling.
 
-### Railway (API)
+### Render (API)
 
-1. Deploy from the repo with the Dockerfile builder. **Clear any custom Start Command.**
-2. Set variables from `.env.example`: `PINECONE_API_KEY`, `GROQ_API_KEY`, `CF_API_TOKEN`, `CF_ACCOUNT_ID`, `EMBEDDING_BACKEND=cf`, `REASONING_EFFORT=low`, and `FRONTEND_ORIGIN`. Railway injects `PORT`.
-3. Verify with `GET /version`, which should report `"embedding_backend": "cf"`. The boot logs should contain `engine_ready` and `warmup_ok`.
+1. Create a **Web Service** from the repo with the **Docker** runtime. **Leave the Docker Command empty** so the image's `CMD ["python", "main.py"]` runs.
+2. Set environment variables from `.env.example`: `PINECONE_API_KEY`, `GROQ_API_KEY`, `CF_API_TOKEN`, `CF_ACCOUNT_ID`, `EMBEDDING_BACKEND=cf`, `REASONING_EFFORT=low`, and `FRONTEND_ORIGIN`. Render injects `PORT`, and `Settings` binds `0.0.0.0:$PORT`.
+3. Set the **Health Check Path** to `/health`.
+4. Verify with `GET /version`, which should report `"embedding_backend": "cf"`. The boot logs should contain `engine_ready` and `warmup_ok`.
 
-Measured idle memory is about 150 MB in total with `cf` and about 915 MB with `local`, so only `cf` fits a 512 MB plan.
+Measured idle memory is about 150 MB in total with `cf` and about 915 MB with `local`, so only `cf` fits the 512 MB free instance.
+
+Free instances spin down after 15 minutes without traffic, and the first request after that waits for a cold start (up to about a minute). Both clients hide most of it. The Streamlit UI pings `/health`, and the portfolio frontend calls `/version` once the page is idle, so the container is usually awake by the time a visitor sends a question. The portfolio's request timeout is 90 s, and the UI's read timeout is 120 s.
 
 ### Streamlit Community Cloud (UI)
 
 - Main file: `interfaces/streamlit_app.py`. Dependencies come from `requirements.txt` (`-e .[ui]`, no torch).
-- Secrets: `ASTARBOT_API_URL = "https://<your-railway-domain>"`. No Cloudflare, Pinecone or Groq keys are needed, because the UI never embeds or retrieves anything itself.
+- Secrets: `ASTARBOT_API_URL = "https://<your-service>.onrender.com"`. No Cloudflare, Pinecone or Groq keys are needed, because the UI never embeds or retrieves anything itself.
 - On page load, a background thread sends one `/health` ping per session to wake a sleeping container while the visitor reads.
 
 ### Devcontainer / Codespaces
@@ -584,7 +591,7 @@ Raw questions are logged only at `DEBUG`. Third-party loggers (`httpx`, `urllib3
 
 These decisions came from measurement, not assumption.
 
-- **Latency was an environment problem.** Locally, the code answered in 1.3 to 2.9 s. On a 512 MB Railway container, the API took around 30 s because torch and BGE pushed the worker to about 860 MB RSS, which caused memory stalls and restarts. Moving query embeddings off-process fixed it. Streaming, concurrency and caching are secondary improvements.
+- **Latency was an environment problem.** Locally, the code answered in 1.3 to 2.9 s. On the original 512 MB Railway container (the API has since moved to Render), the API took around 30 s because torch and BGE pushed the worker to about 860 MB RSS, which caused memory stalls and restarts. Moving query embeddings off-process fixed it. Streaming, concurrency and caching are secondary improvements.
 - **Hosted embeddings moved from Hugging Face to Cloudflare** because the Hugging Face free tier is credit-gated and starts returning 401/402 once the credit runs out. Cloudflare serves the same model with a daily request quota. The vector space is unchanged as long as CLS pooling is requested.
 - **The guard and retrieval run in parallel.** The results match sequential execution exactly, and only wall-clock time changes. In the rare unsafe case, one retrieval is wasted.
 - **Retrieval failures produce the "technical snag" message, not an off-topic refusal**, so a visitor isn't told a valid question is out of scope during an outage.
@@ -610,5 +617,5 @@ Every lever below is an environment change. None needs a code change.
 | Follow-ups lose their referent | Set `RECENT_TURNS_IN_PROMPT=4` |
 | Worker recycling disrupts sessions | Raise `WORKER_MAX_REQUESTS`, or set it to `0` |
 | `ld.so` preload errors in the container | Remove the `LD_PRELOAD` / `MALLOC_CONF` lines from the Dockerfile |
-| UI says "Waking the AStarBot API…" for a long time | The Railway container is cold-starting. Check `ASTARBOT_API_URL` and the API's `/health`. |
+| UI says "Waking the AStarBot API…" for a long time | The Render instance is cold-starting after spinning down. Check `ASTARBOT_API_URL` and the API's `/health`. |
 | Startup `ValidationError` | `EMBEDDING_BACKEND` must be `auto`, `cf` or `local`. `CF_POOLING` must be `cls` or `mean`. |

@@ -3,8 +3,8 @@
     "source": "self",
     "description": "Identity, education, location, current status and career decisions.",
     "owner": "Avrodeep Pal",
-    "last_updated": "2026-10-22",
-    "version": 5
+    "last_updated": "2026-10-26",
+    "version": 6
   },
   "entries": [
     {
@@ -135,6 +135,16 @@
       "tags": ["location","where does he live","city","based in","barrackpore","kolkata","west bengal","india","contact","reach out","email","linkedin","remote"],
       "aliases": ["where is he based","how do I contact him","his location","contact details"],
       "priority": 5
+    },
+    {
+      "id": "self-age-birthday",
+      "title": "Age and birthday",
+      "text": "I'm 24 years old as of October 2026. My exact birthday and date of birth are concealed — I keep them private. If you need them for something specific, send me a message through the Contact Me section of this portfolio and I'll get back to you directly.",
+      "links": [],
+      "tags": ["age","how old","years old","24","birthday","date of birth","dob","born","birth date","when was he born","personal"],
+      "aliases": ["how old is he","what is his age","how old is avrodeep","when is his birthday","what is his date of birth","when was he born","what is his dob","his birthday"],
+      "priority": 3,
+      "last_verified": "2026-10-26"
     }
   ]
 }

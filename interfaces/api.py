@@ -1,4 +1,4 @@
-"""FastAPI backend — the deployment target (Railway or similar).
+"""FastAPI backend — the deployment target (Render or similar).
 
 Stateless by design: the client sends `recent_messages` + `summary` and
 receives `updated_summary` back. No sessions, no auth.
@@ -154,7 +154,7 @@ async def chat_stream_endpoint(payload: ChatRequest, request: Request) -> Stream
     return StreamingResponse(
         stream,
         media_type="text/plain; charset=utf-8",
-        # Ask proxies (Railway's edge included) not to buffer the body.
+        # Ask proxies (Render's included) not to buffer the body.
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 

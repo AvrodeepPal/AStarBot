@@ -3,5 +3,5 @@
 #
 # The core install has no torch / sentence-transformers (they live in the
 # [local-embed] extra), so this fits Streamlit Cloud's 1 GB tier.
-# The Railway image installs from pyproject.toml directly (see Dockerfile).
+# The Render image installs from pyproject.toml directly (see Dockerfile).
 -e .[ui]

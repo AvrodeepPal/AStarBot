@@ -57,6 +57,8 @@ ON_TOPIC = [
     "explain his credit risk eda project",
     "what is he working on now",
     "what are his weaknesses",
+    "how old is he",
+    "when is his birthday",
 ]
 
 # Questions the bot SHOULD refuse; ideally none of these clear the threshold.

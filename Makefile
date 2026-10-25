@@ -45,7 +45,7 @@ test:
 lint:
 	$(PYTHON) -m ruff check .
 
-# Slim image for EMBEDDING_BACKEND=cf (Railway).
+# Slim image for EMBEDDING_BACKEND=cf (Render).
 docker-build:
 	docker build -t astarbot:$(VERSION) .
 

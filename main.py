@@ -1,4 +1,4 @@
-"""Uvicorn launcher for the FastAPI backend (Docker / Railway entry point).
+"""Uvicorn launcher for the FastAPI backend (Docker / Render entry point).
 
 One worker process, recycled every WORKER_MAX_REQUESTS requests.
 

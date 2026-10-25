@@ -53,7 +53,7 @@ ARG INSTALL_LOCAL_EMBED=false
 # process: background_thread purges in the background, dirty/muzzy decay
 # control how fast, and narenas:2 avoids per-core arenas a 1-vCPU box
 # can't use. The library path is arch-specific, so it's symlinked to one
-# fixed path that works on both amd64 (Railway) and arm64 (Apple silicon).
+# fixed path that works on both amd64 (Render) and arm64 (Apple silicon).
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH" \
