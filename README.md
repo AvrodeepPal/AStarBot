@@ -92,6 +92,8 @@ make ui                  # Streamlit client on http://localhost:8501
 
 For a lighter install with no torch, which needs Cloudflare credentials, run `make install` in place of `make dev`. The full list of targets is in the [appendix](APPENDIX.md#3-makefile-reference).
 
+The Streamlit client started by `make ui` is shown in [Figure: AStarBot Streamlit UI](astarbot.png "Figure: AStarBot Streamlit client with the model and retrieval settings sidebar").
+
 ---
 
 ## API at a glance
