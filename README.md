@@ -92,7 +92,13 @@ make ui                  # Streamlit client on http://localhost:8501
 
 For a lighter install with no torch, which needs Cloudflare credentials, run `make install` in place of `make dev`. The full list of targets is in the [appendix](APPENDIX.md#3-makefile-reference).
 
-The Streamlit client started by `make ui` is shown in [Figure: AStarBot Streamlit UI](astarbot.png "Figure: AStarBot Streamlit client with the model and retrieval settings sidebar").
+`make ui` starts the Streamlit client shown in **Figure 1**.
+
+<p align="center">
+  <img src="astarbot.png" alt="AStarBot Streamlit client with a settings sidebar listing prompt version, models, embeddings and retrieval settings, and the bot's greeting in the chat pane" width="850">
+</p>
+
+<p align="center"><em>Figure 1: The AStarBot Streamlit client (v2.4.1 beta). The sidebar shows the live configuration reported by the API (prompt version, primary and fallback LLMs, BGE embeddings, top-k retrieval and streaming), and the chat pane opens with the bot's scoped greeting.</em></p>
 
 ---
 
