@@ -1,7 +1,8 @@
 """FastAPI backend — the deployment target (Render or similar).
 
 Stateless by design: the client sends `recent_messages` + `summary` and
-receives `updated_summary` back. No sessions, no auth.
+receives `updated_summary` back. No sessions, no auth; the three POST routes
+are rate-limited per IP (interfaces/ratelimit.py).
 
 Endpoints:
     POST /chat          main chat, one JSON response
@@ -22,11 +23,12 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from interfaces.ratelimit import RateLimiter, rate_limit
 from rag import __version__
 from rag.config import settings
 from rag.engine import RAGEngine
@@ -44,6 +46,7 @@ async def lifespan(app: FastAPI):
     # as soon as the engine exists; it wakes the embedder, opens the Pinecone
     # connection and seeds the retrieval cache.
     app.state.engine = RAGEngine()
+    app.state.rate_limiter = RateLimiter(settings.rate_limit_requests, settings.rate_limit_window_seconds)
     warmup = asyncio.create_task(app.state.engine.warmup())
     yield
     warmup.cancel()
@@ -107,7 +110,7 @@ class SummarizeResponse(BaseModel):
 # ---- routes --------------------------------------------------------------
 
 
-@app.post("/chat", response_model=ChatResponse)
+@app.post("/chat", response_model=ChatResponse, dependencies=[Depends(rate_limit)])
 async def chat_endpoint(payload: ChatRequest, request: Request) -> ChatResponse:
     log.info(
         "chat_request",
@@ -126,7 +129,7 @@ async def chat_endpoint(payload: ChatRequest, request: Request) -> ChatResponse:
     return ChatResponse(answer=result["answer"], updated_summary=result["updated_summary"])
 
 
-@app.post("/chat/stream")
+@app.post("/chat/stream", dependencies=[Depends(rate_limit)])
 async def chat_stream_endpoint(payload: ChatRequest, request: Request) -> StreamingResponse:
     """Token-streamed /chat. The body is plain UTF-8 text, not SSE frames.
 
@@ -159,7 +162,7 @@ async def chat_stream_endpoint(payload: ChatRequest, request: Request) -> Stream
     )
 
 
-@app.post("/summarize", response_model=SummarizeResponse)
+@app.post("/summarize", response_model=SummarizeResponse, dependencies=[Depends(rate_limit)])
 async def summarize_endpoint(payload: SummarizeRequest, request: Request) -> SummarizeResponse:
     updated = await request.app.state.engine.asummarize(
         recent_messages=[m.model_dump() for m in payload.recent_messages],

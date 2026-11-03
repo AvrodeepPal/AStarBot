@@ -136,6 +136,10 @@ class Settings(BaseSettings):
     # Recycle the uvicorn worker after this many requests to cap slow RSS
     # growth; main.py keeps a supervisor alive to respawn it. 0 disables.
     worker_max_requests: int = Field(default=500, ge=0)
+    # Per-IP sliding-window limit on /chat, /chat/stream and /summarize.
+    # /health and /version are never limited. 0 disables.
+    rate_limit_requests: int = Field(default=10, ge=0)
+    rate_limit_window_seconds: float = Field(default=60.0, gt=0)
 
     # ---- CORS ------------------------------------------------------------
     # Comma-separated list of allowed origins, or "*" for any.

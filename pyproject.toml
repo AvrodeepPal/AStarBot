@@ -14,8 +14,9 @@ dependencies = [
     "pydantic>=2.6.0",
     "pydantic-settings>=2.2.0",
     "fastapi>=0.110.0",
-    # >=0.30: the Multiprocess supervisor respawns dead workers (main.py relies on it)
-    "uvicorn[standard]>=0.30.0",
+    # >=0.51: Multiprocess(config, sockets) signature used by main.py (the `target`
+    # arg was removed in 0.51); its supervisor respawns dead workers.
+    "uvicorn[standard]>=0.51.0",
     "pinecone>=5.0.0",
     "langchain-core>=0.2.0",
     "langchain-groq>=0.1.5",

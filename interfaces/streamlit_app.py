@@ -194,6 +194,18 @@ for msg in st.session_state.messages:
 
 
 
+def show_api_error(exc: requests.RequestException) -> None:
+    """Show the API's own message for a 429; a generic error otherwise."""
+    resp = getattr(exc, "response", None)
+    if resp is not None and resp.status_code == 429:
+        try:
+            st.warning(resp.json()["detail"])
+            return
+        except (ValueError, KeyError, TypeError):
+            pass
+    st.error(f"Couldn't reach AStarBot's API: {exc}")
+
+
 def answer_streaming(question: str) -> tuple[str | None, str | None]:
     """Render the answer as it streams. Returns (answer, updated_summary)."""
     previous = st.session_state.summary
@@ -205,7 +217,7 @@ def answer_streaming(question: str) -> tuple[str | None, str | None]:
     except requests.HTTPError as exc:
         if exc.response is not None and exc.response.status_code == 404:
             return answer_blocking(question)  # streaming switched off since /version was cached
-        st.error(f"Couldn't reach AStarBot's API: {exc}")
+        show_api_error(exc)
         return None, previous
     except requests.RequestException as exc:
         st.error(f"Couldn't reach AStarBot's API: {exc}")
@@ -237,7 +249,7 @@ def answer_blocking(question: str) -> tuple[str | None, str | None]:
         with st.spinner("Thinking…"):
             result = call_chat(question, st.session_state.messages, previous)
     except requests.RequestException as exc:
-        st.error(f"Couldn't reach AStarBot's API: {exc}")
+        show_api_error(exc)
         return None, previous
     st.markdown(result["answer"])
     return result["answer"], result["updated_summary"]
